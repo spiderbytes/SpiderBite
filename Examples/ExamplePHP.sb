@@ -1,0 +1,56 @@
+﻿XIncludeFile "../includes/SpiderBite.sbi"
+
+#SpiderBite_Profile = "default"
+
+Procedure myPhpProcedure3Callback(Success, Result.s)
+  
+  Debug Success
+  Debug Result
+  
+EndProcedure
+
+Procedure myPhpProcedure4Callback(Success, Result.s)
+  
+  Debug Success
+  Debug Result
+  
+EndProcedure
+
+EnablePHP
+  
+  Procedure myPhpProcedure1()
+    
+    ! return "Hello from myPhpProcedure1";
+    
+  EndProcedure
+  
+  Procedure myPhpProcedure2(Message.s)
+    
+    ! return "Hello from " . $Message ;
+    
+  EndProcedure
+  
+  Procedure myPhpProcedure3()
+    
+    ! return "Hello from myPhpProcedure3";
+    
+  EndProcedure
+  
+  Procedure myPhpProcedure4(Message.s)
+    
+    ! return "Hello from " . $Message ;
+    
+  EndProcedure
+  
+DisablePHP
+
+Debug myPhpProcedure1()                  ; without callback, without parameter
+Debug myPhpProcedure2("myPhpProcedure2") ; without callback, with parameter
+
+myPhpProcedure3()                  ; with callback, without parameter
+myPhpProcedure4("myPhpProcedure4") ; with callback, with parameter
+
+If 1=2
+  myPhpProcedure3Callback(0, "")
+  myPhpProcedure4Callback(0, "")
+EndIf

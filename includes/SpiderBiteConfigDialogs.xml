@@ -1,0 +1,135 @@
+<dialogs>
+	<window id='#winMain' name='winMain' text='SpiderBiteConfig' minwidth='300' minheight='300' flags='#PB_Window_ScreenCentered | #PB_Window_SystemMenu | #PB_Window_SizeGadget'>
+		<container>
+			<hbox expand='item:1'>
+				<listview id='#winMain_lstProfiles' onevent='winMain_lstProfiles_Event()' />
+				<vbox expand='item:4'>
+					<button text="Add..." id='#winMain_cmdAdd' onevent='winMain_cmdAdd_Event()' />
+					<button text="Edit..." id='#winMain_cmdEdit' onevent='winMain_cmdEdit_Event()' />
+					<button text="Delete..." id='#winMain_cmdDelete' onevent='winMain_cmdDelete_Event()' />
+					<empty />
+				</vbox>
+			</hbox>
+		</container>
+	</window> 
+	<window id='#winConfig' name='winConfig' text='' minwidth='640' minheight='480' flags='#PB_Window_ScreenCentered | #PB_Window_SystemMenu | #PB_Window_SizeGadget'>
+		<vbox expand='item:2'>
+			<hbox expand='item:2'>
+				<text text='Profile-Name:' />
+				<string id='#winConfig_txtProfileName' />
+			</hbox>
+			<panel>
+				<tab text='PureBasic CGI'>
+					<vbox expand='item:5'>
+						<vbox>
+							<text text='PureBasic-Compiler:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtPbCompiler' />
+								<button text='...' id='#winConfig_cmdPbCompiler' onevent='winConfig_ChoosePathEvent()' />
+							</hbox>
+						</vbox>
+						<vbox>
+							<text text='PbCgiServerFilename:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtPbCgiServerFilename' />
+								<button text='...' id='#winConfig_cmdPbCgiServerFilename' onevent='winConfig_ChoosePathEvent()' />
+							</hbox>
+						</vbox>
+						<vbox>
+							<text text='PbCgiServerAddress:' />
+							<string height='22' id='#winConfig_txtPbCgiServerAddress' />
+						</vbox>
+						<vbox>
+							<text text='PbCgiTemplate:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtPbCgiTemplate' />
+								<button text='...' id='#winConfig_cmdPbCgiTemplate' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<empty />
+					</vbox>
+				</tab>
+				<tab text='PHP'>
+					<vbox expand='item:4'>
+						<vbox>
+							<text text='PhpServerFilename:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtPhpServerFilename' />
+								<button text='...' id='#winConfig_cmdPhpServerFilename' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<vbox>
+							<text text='PhpServerAddress:' />
+							<string height='22' id='#winConfig_txtPhpServerAddress' />
+						</vbox>
+						<vbox>
+							<text text='PhpTemplate:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtPhpTemplate' />
+								<button text='...' id='#winConfig_cmdPhpTemplate' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<empty />
+					</vbox>
+				</tab>
+				<tab text='ASP'>
+					<vbox expand='item:4'>
+						<vbox>
+							<text text='AspServerFilename:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtAspServerFilename' />
+								<button text='...' id='#winConfig_cmdAspServerFilename' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<vbox>
+							<text text='AspServerAddress:' />
+							<string height='22' id='#winConfig_txtAspServerAddress' />
+						</vbox>
+						<vbox>
+							<text text='AspTemplate:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtAspTemplate' />
+								<button text='...' id='#winConfig_cmdAspTemplate' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<empty />
+					</vbox>
+				</tab>
+				<tab text='ASPX'>
+					<vbox expand='item:4'>
+						<vbox>
+							<text text='AspxServerFilename:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtAspxServerFilename' />
+								<button text='...' id='#winConfig_cmdAspxServerFilename' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<vbox>
+							<text text='AspxServerAddress:' />
+							<string height='22' id='#winConfig_txtAspxServerAddress' />
+						</vbox>
+						<vbox>
+							<text text='AspxTemplate:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtAspxTemplate' />
+								<button text='...' id='#winConfig_cmdAspxTemplate' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<empty />
+					</vbox>
+				</tab>
+				<tab text='Python'>
+					<text text='not supported yet' />
+				</tab>
+				<tab text='NodeJS'>
+					<text text='not supported yet' />
+				</tab>
+			</panel>
+			<hbox expand='item:1'>
+				<empty />
+				<button text='OK' width='100' id='#winConfig_cmdOK' onevent='winConfig_cmdOK_Event()' />
+				<button text='Cancel' width='100' id='#winConfig_cmdCancel' onevent='winConfig_cmdCancel_Event()' />
+			</hbox>
+		</vbox>
+	</window> 
+</dialogs>

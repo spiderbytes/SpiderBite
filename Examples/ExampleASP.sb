@@ -1,0 +1,56 @@
+﻿XIncludeFile "../includes/SpiderBite.sbi"
+
+#SpiderBite_Profile = "default"
+
+Procedure myASPProcedure3Callback(Success, Result.s)
+  
+  Debug Success
+  Debug Result
+  
+EndProcedure
+
+Procedure myASPProcedure4Callback(Success, Result.s)
+  
+  Debug Success
+  Debug Result
+  
+EndProcedure
+
+EnableASP
+  
+  Procedure myASPProcedure1()
+    
+    ! myASPProcedure1 = "Hello from myASPProcedure1"
+    
+  EndProcedure
+  
+  Procedure myASPProcedure2(Message.s)
+    
+    ! myASPProcedure2 = "Hello from " & Message 
+    
+  EndProcedure
+  
+  Procedure myASPProcedure3()
+    
+    ! myASPProcedure3 = "Hello from myASPProcedure3"
+    
+  EndProcedure
+  
+  Procedure myASPProcedure4(Message.s)
+    
+    ! myASPProcedure4 = "Hello from " & Message
+    
+  EndProcedure
+  
+DisableASP
+
+Debug myASPProcedure1()                  ; without callback, without parameter
+Debug myASPProcedure2("myASPProcedure2") ; without callback, with parameter
+
+myASPProcedure3()                  ; with callback, without parameter
+myASPProcedure4("myASPProcedure4") ; with callback, with parameter
+
+If 1=2
+  myASPProcedure3Callback(0, "")
+  myASPProcedure4Callback(0, "")
+EndIf

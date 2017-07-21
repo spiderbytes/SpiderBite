@@ -1,0 +1,56 @@
+﻿XIncludeFile "../includes/SpiderBite.sbi"
+
+#SpiderBite_Profile = "default"
+
+Procedure myASPXProcedure3Callback(Success, Result.s)
+  
+  Debug Success
+  Debug Result
+  
+EndProcedure
+
+Procedure myASPXProcedure4Callback(Success, Result.s)
+  
+  Debug Success
+  Debug Result
+  
+EndProcedure
+
+EnableASPX
+  
+  Procedure myASPXProcedure1()
+    
+    ! return "Hello from myASPXProcedure1"
+    
+  EndProcedure
+  
+  Procedure myASPXProcedure2(Message.s)
+    
+    ! return "Hello from " & Message 
+    
+  EndProcedure
+  
+  Procedure myASPXProcedure3()
+    
+    ! return "Hello from myASPXProcedure3"
+    
+  EndProcedure
+  
+  Procedure myASPXProcedure4(Message.s)
+    
+    ! return "Hello from " & Message
+    
+  EndProcedure
+  
+DisableASPX
+
+Debug myASPXProcedure1()                  ; without callback, without parameter
+Debug myASPXProcedure2("myASPXProcedure2") ; without callback, with parameter
+
+myASPXProcedure3()                  ; with callback, without parameter
+myASPXProcedure4("myASPXProcedure4") ; with callback, with parameter
+
+If 1=2
+  myASPXProcedure3Callback(0, "")
+  myASPXProcedure4Callback(0, "")
+EndIf

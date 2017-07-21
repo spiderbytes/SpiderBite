@@ -1,0 +1,118 @@
+﻿XIncludeFile "../includes/SpiderBite.sbi"
+
+#SpiderBite_Profile = "default"
+
+Procedure myPbCgiProcedure3Callback(Success, Result.s)
+  
+  Debug Success
+  Debug Result
+  
+EndProcedure
+
+Procedure myPbCgiProcedure4Callback(Success, Result.s)
+  
+  Debug Success
+  Debug Result
+  
+EndProcedure
+
+Procedure ReadFromFileCallback(Success, Result.s)
+  If Success
+    Debug "Callback Success! :-)"
+    Debug "Filecontent: '" + Result + "'"
+  Else
+    Debug "Callback Failed: " + Result
+  EndIf
+EndProcedure
+
+EnablePbCgi
+  
+  Procedure.s myPbCgiProcedure1()
+    ProcedureReturn "Hello from myPbCgiProcedure1"
+  EndProcedure
+  
+  Procedure.s myPbCgiProcedure2(Message.s)
+    ProcedureReturn "Hello from " + Message 
+  EndProcedure
+  
+  Procedure.s myPbCgiProcedure3()
+    ProcedureReturn "Hello from myPbCgiProcedure3"
+  EndProcedure
+  
+  Procedure.s myPbCgiProcedure4(Message.s)
+    ProcedureReturn "Hello from " + Message
+  EndProcedure
+  
+  Procedure WriteToFile(Filename.s, StringToWrite.s)
+    
+    Protected FF
+    
+    FF = CreateFile(#PB_Any, Filename, #PB_Ascii)
+    
+    If FF
+      WriteString(FF, StringToWrite) 
+      CloseFile(FF)
+    EndIf
+    
+  EndProcedure
+  
+  Procedure.s ReadFromFile(Filename.s)
+    
+    Protected FF
+    Protected ReturnValue.s
+    
+    FF = ReadFile(#PB_Any, Filename)
+    If FF
+      ReturnValue = ReadString(FF)
+      CloseFile(FF)
+    EndIf
+    
+    ProcedureReturn ReturnValue
+    
+  EndProcedure  
+  
+DisablePbCgi
+
+Debug myPbCgiProcedure1()                    ; without callback, without parameter
+Debug myPbCgiProcedure2("myPbCgiProcedure2") ; without callback, with parameter
+
+myPbCgiProcedure3()                    ; with callback, without parameter
+myPbCgiProcedure4("myPbCgiProcedure4") ; with callback, with parameter
+
+WriteToFile("test.txt", "Timestamp: " + Str(Date()))
+Debug ReadFromFile("test.txt")
+
+If 1=2
+  myPbCgiProcedure3Callback(0, "")
+  myPbCgiProcedure4Callback(0, "")
+  ReadFromFileCallback(0, "")
+EndIf
+
+; PbCgiProcedureDLL.s DatabaseOperation()
+;   
+;   Protected ReturnValue.s
+;   
+;   UseSQLiteDatabase()
+;   
+;   OpenDatabase(0, ":memory:", "", "", #PB_Database_SQLite)
+;   
+;   DatabaseUpdate(0, "Create Table myTable (myField1)")
+;   
+;   DatabaseUpdate(0, "Insert Into myTable (myField1) Values ('myValue1')")
+;   DatabaseUpdate(0, "Insert Into myTable (myField1) Values ('myValue2')")
+;   DatabaseUpdate(0, "Insert Into myTable (myField1) Values ('myValue3')")
+;   
+;   DatabaseQuery(0, "Select myField1 From myTable")
+;   
+;   While NextDatabaseRow(0)
+;     
+;     ReturnValue + GetDatabaseString(0, 0) + #CRLF$
+;     
+;   Wend
+;   
+;   CloseDatabase(0)
+;   
+;   ProcedureReturn ReturnValue
+;   
+; EndProcedure
+

@@ -1,0 +1,192 @@
+﻿Macro EnablePHP
+EndMacro
+Macro DisablePHP
+EndMacro
+
+Macro EnableASP
+EndMacro
+Macro DisableASP
+EndMacro
+
+Macro EnableASPX
+EndMacro
+Macro DisableASPX
+EndMacro
+
+Macro EnablePbCgi
+EndMacro
+Macro DisablePbCgi
+EndMacro
+
+Macro EnablePython
+EndMacro
+Macro DisablePython
+EndMacro
+
+Macro EnableNodeJs
+EndMacro
+Macro DisableNodeJs
+EndMacro
+
+
+;{- DataBase
+
+; Result = AffectedDatabaseRows(#Database) 
+Procedure AffectedDatabaseRows(Database)
+EndProcedure
+
+; Text$ = CheckDatabaseNull(#Database, Column)
+Procedure.s CheckDatabaseNull(Database, Column)
+EndProcedure
+
+; CloseDatabase(#Database)
+Procedure CloseDatabase(Database)
+EndProcedure
+
+; Result = DatabaseColumnIndex(#Database, ColumnName$)
+Procedure DatabaseColumnIndex(Database, ColumnName.s)
+EndProcedure
+
+; Text$ = DatabaseColumnName(#Database, Column) 
+Procedure.s DatabaseColumnName(Database, Column) 
+EndProcedure
+
+; Result = DatabaseColumnSize(#Database, Column) 
+Procedure DatabaseColumnSize(Database, Column) 
+EndProcedure
+
+; Result = DatabaseColumnType(#Database, Column) 
+Procedure DatabaseColumnType(Database, Column)
+EndProcedure
+
+; Result = DatabaseColumns(#Database)
+Procedure DatabaseColumns(Database)
+EndProcedure
+
+; Text$ = DatabaseDriverDescription() 
+Procedure.s DatabaseDriverDescription()
+EndProcedure
+
+; Text$ = DatabaseDriverName() 
+Procedure.s DatabaseDriverName()
+EndProcedure
+
+; Error$ = DatabaseError()
+Procedure.s DatabaseError()
+EndProcedure
+
+; DatabaseID = DatabaseID(#Database)
+Procedure DatabaseID(Database)
+EndProcedure
+
+; Result = DatabaseQuery(#Database, Request$ [, Flags])
+Procedure DatabaseQuery(Database, Request.s, Flags = 0)
+EndProcedure
+
+; Result = DatabaseUpdate(#Database, Request$)
+Procedure DatabaseUpdate(Database, Request.s)
+EndProcedure
+
+; Result = ExamineDatabaseDrivers()
+Procedure ExamineDatabaseDrivers()
+EndProcedure
+
+; FinishDatabaseQuery(#Database)
+Procedure FinishDatabaseQuery(Database)
+EndProcedure
+
+; Result = FirstDatabaseRow(#Database)
+Procedure FirstDatabaseRow(Database)
+EndProcedure
+
+; Result = GetDatabaseBlob(#Database, Column, *Buffer, BufferLength)
+Procedure GetDatabaseBlob(Database, Column, *Buffer, BufferLength)
+EndProcedure
+
+; Result.d = GetDatabaseDouble(#Database, Column)
+Procedure.d GetDatabaseDouble(Database, Column)
+EndProcedure
+
+; Result.f = GetDatabaseFloat(#Database, Column)
+Procedure.f GetDatabaseFloat(Database, Column)
+EndProcedure
+
+; Result = GetDatabaseLong(#Database, Column)
+Procedure GetDatabaseLong(Database, Column)
+EndProcedure
+
+; Result.q = GetDatabaseQuad(#Database, Column)
+Procedure.q GetDatabaseQuad(Database, Column)
+EndProcedure
+
+; Text$ = GetDatabaseString(#Database, Column)
+Procedure.s GetDatabaseString(Database, Column)
+EndProcedure
+
+; Result = IsDatabase(#Database)
+Procedure IsDatabase(Database)
+EndProcedure
+
+; Result = NextDatabaseDriver()
+Procedure NextDatabaseDriver()
+EndProcedure
+
+; Result = NextDatabaseRow(#Database)
+Procedure NextDatabaseRow(Database)
+EndProcedure
+
+; Result = OpenDatabase(#Database, DatabaseName$, User$, Password$ [, Plugin]) 
+Procedure OpenDatabase(Database, DatabaseName.s, User.s, Password.s, Plugin = 0) 
+EndProcedure
+
+; ; Result = OpenDatabaseRequester(#Database [, Plugin]) 
+; Procedure OpenDatabaseRequester(Database, Plugin = 0) ; NoNoNo! No Requester on ServerSide!!!
+; EndProcedure
+
+; Result = PreviousDatabaseRow(#Database)
+Procedure PreviousDatabaseRow(Database)
+EndProcedure
+
+; SetDatabaseBlob(#Database, StatementIndex, *Buffer, BufferLength)
+Procedure SetDatabaseBlob(Database, StatementIndex, *Buffer, BufferLength)
+EndProcedure
+
+; SetDatabaseDouble(#Database, StatementIndex, Value.d)
+Procedure SetDatabaseDouble(Database, StatementIndex, Value.d)
+EndProcedure
+
+; SetDatabaseFloat(#Database, StatementIndex, Value.f)
+Procedure SetDatabaseFloat(Database, StatementIndex, Value.f)
+EndProcedure
+
+; SetDatabaseLong(#Database, StatementIndex, Value)
+Procedure SetDatabaseLong(Database, StatementIndex, Value)
+EndProcedure
+
+; SetDatabaseNull(#Database, StatementIndex)
+Procedure SetDatabaseNull(Database, StatementIndex)
+EndProcedure
+
+; SetDatabaseQuad(#Database, StatementIndex, Value.q)
+Procedure SetDatabaseQuad(Database, StatementIndex, Value.q)
+EndProcedure
+
+; SetDatabaseString(#Database, StatementIndex, Value$)
+Procedure SetDatabaseString(Database, StatementIndex, Value.s)
+EndProcedure
+
+; UseODBCDatabase()
+Procedure UseODBCDatabase()
+EndProcedure
+
+; UsePostgreSQLDatabase()
+Procedure UsePostgreSQLDatabase()
+EndProcedure
+
+; UseSQLiteDatabase()
+Procedure UseSQLiteDatabase()
+EndProcedure
+
+;}-
+
+
