@@ -153,77 +153,78 @@ Procedure.s GetRequestSelect4PbCgi(ServerCode.s)
   Protected ParamCounter
   
   ForEach Token()
-    
-    
-    Select Token()\Type
-      Case #PBSC_Identifier
-        Select LCase(Token()\Token)
-          Case "procedure"
-            
-            ParamCounter = 1 ; ParamCounter starts at 1!
-            
-            isString = #False
-            
-            NextElement(Token())
-            
-            If Token()\Token = "."
-              
-              NextElement(Token())
-              
-              If LCase(Token()\Token) = "s"
-                isString = #True
-              EndIf
-              
-              NextElement(Token())
-              
-            EndIf
-            
-            ProcName = Token()\Token
-            
-            RequestSelect + #TAB$ + "Case " + Chr(34) + LCase(ProcName) + Chr(34) + #CRLF$
-            
-            If isString
-              RequestSelect + #TAB$ + #TAB$ + "ReturnValue = " + ProcName + "("
-            Else
-              RequestSelect + #TAB$ + #TAB$ + "ReturnValue = Str(" + ProcName + "("
-            EndIf
-            
-            NextElement(Token()) ; Klammer auf
-            NextElement(Token()) ; Klammer zu?
-            
-            While Token()\Token <> ")"
-              
-              RequestSelect + " CGIParameterValue(" + Chr(34) + Chr(34) + ", " + ParamCounter + "), "
-              
-              ParamCounter + 1
-              
-              ; RequestSelect + " GetValue(" + Chr(34) + Token()\Token + Chr(34) + "), "
-              
-              If CheckNextToken(Token(), ".")
-                NextElement(Token())
-                NextElement(Token())
-              EndIf
-              
-              If CheckNextToken(Token(), ",")
-                NextElement(Token())
-              EndIf
-              
-              NextElement(Token())
-              
-            Wend
-            
-            If EndsWith(Trim(RequestSelect), ",")
-              RequestSelect = Left(Trim(RequestSelect), Len(Trim(RequestSelect)) - 1)
-            EndIf
-            
-            If isString
-              RequestSelect + ")" + #CRLF$
-            Else
-              RequestSelect + "))" + #CRLF$
-            EndIf
-            
-        EndSelect
-    EndSelect
+  	
+  	Select Token()\Type
+  			
+  		Case #PBSC_Identifier
+  			
+  			If LCase(Token()\Token) = "procedure"
+  				
+  				ParamCounter = 1 ; ParamCounter starts at 1!
+  				
+  				isString = #False
+  				
+  				NextElement(Token())
+  				
+  				If Token()\Token = "."
+  					
+  					NextElement(Token())
+  					
+  					If LCase(Token()\Token) = "s"
+  						isString = #True
+  					EndIf
+  					
+  					NextElement(Token())
+  					
+  				EndIf
+  				
+  				ProcName = Token()\Token
+  				
+  				RequestSelect + #TAB$ + "Case " + Chr(34) + LCase(ProcName) + Chr(34) + #CRLF$
+  				
+  				If isString
+  					RequestSelect + #TAB$ + #TAB$ + "ReturnValue = " + ProcName + "("
+  				Else
+  					RequestSelect + #TAB$ + #TAB$ + "ReturnValue = Str(" + ProcName + "("
+  				EndIf
+  				
+  				NextElement(Token()) ; Klammer auf
+  				NextElement(Token()) ; Klammer zu?
+  				
+  				While Token()\Token <> ")"
+  					
+  					RequestSelect + " CGIParameterValue(" + Chr(34) + Chr(34) + ", " + ParamCounter + "), "
+  					
+  					ParamCounter + 1
+  					
+  					; RequestSelect + " GetValue(" + Chr(34) + Token()\Token + Chr(34) + "), "
+  					
+  					If CheckNextToken(Token(), ".")
+  						NextElement(Token())
+  						NextElement(Token())
+  					EndIf
+  					
+  					If CheckNextToken(Token(), ",")
+  						NextElement(Token())
+  					EndIf
+  					
+  					NextElement(Token())
+  					
+  				Wend
+  				
+  				If EndsWith(Trim(RequestSelect), ",")
+  					RequestSelect = Left(Trim(RequestSelect), Len(Trim(RequestSelect)) - 1)
+  				EndIf
+  				
+  				If isString
+  					RequestSelect + ")" + #CRLF$
+  				Else
+  					RequestSelect + "))" + #CRLF$
+  				EndIf
+  				
+  			EndIf
+  			
+  	EndSelect
   Next
   
   If RequestSelect <> ""
@@ -895,8 +896,20 @@ Procedure.s ConvertToPython(Code.s)
 	
 EndProcedure
 
+Procedure.s RemoveCodeIdentifier(CodeBlock.s, ServerCodeType.s)
+	
+	CodeBlock = Mid(CodeBlock, FindString(CodeBlock, "Enable" + ServerCodeType) + Len("Enable" + ServerCodeType))
+	
+	CodeBlock = Left(CodeBlock, FindString(CodeBlock, "Disable" + ServerCodeType) - 1)
+	
+	ProcedureReturn CodeBlock
+	
+EndProcedure
+
 Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
-  
+	
+	;{
+	
   If FindString(FileContent, "Enable" + ServerCodeType, 1, #PB_String_NoCase) = 0
     ProcedureReturn FileContent
   EndIf
@@ -961,17 +974,11 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
     ProcedureReturn FileContent
   EndIf
   
-  Protected CallbackProcedure.s
+  ;}
   
-  Protected ServerCodeBlock.s
-  NewList ServerProcedure.s()
-  NewList ClientProcedure.s()
-  
-  Protected dataType.s = ""
-  Protected processData.s = ""
-  
+  Protected CodeBlock.s
+  Protected ClientProcedures.s = ""
   Protected ServerCode.s
-  Protected ClientCode.s
   
   Protected regex_SC
   Protected regex_P
@@ -981,77 +988,71 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   ExamineRegularExpression(regex_SC, FileContent)
   
   While NextRegularExpressionMatch(regex_SC)
-    
-    ServerCodeBlock = RegularExpressionMatchString(regex_SC)
-    
-    regex_P = CreateRegularExpression(#PB_Any, "^[\t]*[\ ]*Procedure([\s\S]*?)\(([\s\S]*?)^[\s]*EndProcedure", #PB_RegularExpression_MultiLine | #PB_RegularExpression_NoCase)	
-    
-    ExamineRegularExpression(regex_P, ServerCodeBlock)
-    
-    ClearList(ServerProcedure())
-    ClearList(ClientProcedure())
-    
-    While NextRegularExpressionMatch(regex_P)
-      
-      AddElement(ServerProcedure())
-      ServerProcedure() = RegularExpressionMatchString(regex_P)
-      
-      AddElement(ClientProcedure())
-      ClientProcedure() = StringField(ServerProcedure(), 1, #LF$) + #LF$
-      
-      dataType = "text"
-      processData = "true"
-      
-      CallbackProcedure = StringField(ClientProcedure(), 1, "(")
-      CallbackProcedure = Trim(StringField(CallbackProcedure, CountString(CallbackProcedure, " ") + 1, " "))
-      CallbackProcedure + "Callback"
-      CallbackProcedure = "f_" + LCase(CallbackProcedure)
-      
-      ClientProcedure() + " ! var returnValue; " + #LF$ +
-                          " ! [].unshift.call(arguments, arguments.callee.name.substring(2)); " + #LF$ +
-                          " ! var async; " + #LF$ +
-                          " ! var successFunction; " + #LF$ +
-                          " ! var errorFunction; " + #LF$ +
-                          " ! if (typeof " + CallbackProcedure + " == 'function') { " + #LF$ +
-                          " !   async = true; " + #LF$ +
-                          " ! 	successFunction = function(result) { " + CallbackProcedure + "(true, result); }; " + #LF$ +
-                          " ! 	errorFunction = function(result) { " + CallbackProcedure + "(false, b + '/' + c); }; " + #LF$ +
-                          " ! } else { " + #LF$ +
-                          " !   async = false; " + #LF$ +
-                          " ! 	successFunction = function(result) { returnValue = result; };" + #LF$ +
-                          " ! 	errorFunction = function(result) { returnValue = 'error: ' + b + '/' + c; };" + #LF$ +
-                          " ! }" + #LF$ +
-                          " ! $.ajax({ " + #LF$ +
-                          " ! 	url: '" + ServerAddress + "', " + #LF$ +
-                          " ! 	type: 'POST', " + #LF$ +
-                          " ! 	data: arguments, " + #LF$ +
-                          " ! 	dataType: '" + dataType + "', " + #LF$ +
-                          " ! 	processData: " + processData + ", " + #LF$ +
-                          " ! 	async: async, " + #LF$ +
-                          " ! 	cache: false, " + #LF$ +
-                          " ! 	success: successFunction, " + #LF$ +
-                          " ! 	error: errorFunction " + #LF$ +
-                          " ! }); " + #LF$ +
-                          " ! return returnValue; " + #LF$ +
-                          "EndProcedure" + #LF$
-      
-    Wend
-    
-    FreeRegularExpression(regex_P)
-    
-    ClientCode = ""
-    ForEach ClientProcedure()
-      ClientCode + ClientProcedure() + #LF$
-    Next
-    FileContent = ReplaceString(FileContent, ServerCodeBlock, ClientCode)
-    
-    ForEach ServerProcedure()
-      ServerCode + ServerProcedure() + #LF$
-    Next
-    
+  	
+  	CodeBlock = RegularExpressionMatchString(regex_SC)
+  	
+  	regex_P = CreateRegularExpression(#PB_Any, "^[\t]*[\ ]*Procedure([\s\S]*?)\(([\s\S]*?)^[\s]*EndProcedure", #PB_RegularExpression_MultiLine | #PB_RegularExpression_NoCase)	
+  	
+  	ExamineRegularExpression(regex_P, CodeBlock)
+  	
+  	While NextRegularExpressionMatch(regex_P)
+  		
+  		ClientProcedures + StringField(RegularExpressionMatchString(regex_P), 1, #LF$) + #LF$
+  		
+  		Protected dataType.s
+  		Protected processData.s
+  		
+  		dataType = "text"
+  		processData = "true"
+  		
+  		Protected CallbackProcedure.s
+  		
+  		CallbackProcedure = StringField(ClientProcedures, 1, "(")
+  		CallbackProcedure = Trim(StringField(CallbackProcedure, CountString(CallbackProcedure, " ") + 1, " "))
+  		CallbackProcedure + "Callback"
+  		CallbackProcedure = "f_" + LCase(CallbackProcedure)
+  		
+  		ClientProcedures + " ! var returnValue; " + #LF$ +
+  		                   " ! [].unshift.call(arguments, arguments.callee.name.substring(2)); " + #LF$ +
+  		                   " ! var async; " + #LF$ +
+  		                   " ! var successFunction; " + #LF$ +
+  		                   " ! var errorFunction; " + #LF$ +
+  		                   " ! if (typeof " + CallbackProcedure + " == 'function') { " + #LF$ +
+  		                   " !   async = true; " + #LF$ +
+  		                   " ! 	successFunction = function(result) { " + CallbackProcedure + "(true, result); }; " + #LF$ +
+  		                   " ! 	errorFunction = function(a,b,c) { " + CallbackProcedure + "(false, b + '/' + c); }; " + #LF$ +
+  		                   " ! } else { " + #LF$ +
+  		                   " !   async = false; " + #LF$ +
+  		                   " ! 	successFunction = function(result) { returnValue = result; };" + #LF$ +
+  		                   " ! 	errorFunction = function(a,b,c) { returnValue = 'error: ' + b + '/' + c; };" + #LF$ +
+  		                   " ! }" + #LF$ +
+  		                   " ! $.ajax({ " + #LF$ +
+  		                   " ! 	url: '" + ServerAddress + "', " + #LF$ +
+  		                   " ! 	type: 'POST', " + #LF$ +
+  		                   " ! 	data: arguments, " + #LF$ +
+  		                   " ! 	dataType: '" + dataType + "', " + #LF$ +
+  		                   " ! 	processData: " + processData + ", " + #LF$ +
+  		                   " ! 	async: async, " + #LF$ +
+  		                   " ! 	cache: false, " + #LF$ +
+  		                   " ! 	success: successFunction, " + #LF$ +
+  		                   " ! 	error: errorFunction " + #LF$ +
+  		                   " ! }); " + #LF$ +
+  		                   " ! return returnValue; " + #LF$ +
+  		                   "EndProcedure" + #LF$
+  		
+  	Wend
+  	
+  	FreeRegularExpression(regex_P)
+  	
+  	FileContent = ReplaceString(FileContent, CodeBlock, ClientProcedures)
+  	
+  	ServerCode + RemoveCodeIdentifier(CodeBlock, ServerCodeType) + #LF$
+  	
   Wend
   
   FreeRegularExpression(regex_SC)
+  
+  ;{
   
   ; ----------------------------------------------------------------------
   
@@ -1139,7 +1140,7 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
         
         If ExitCode <> 0
           
-          FileContent = AddCompilerError(FileContent, "Something went wrong :-(");  + ProgramOutput)
+          FileContent = AddCompilerError(FileContent, "Something went wrong :-(" + RemoveString(ProgramOutput, #CRLF$))
           
         EndIf
         
@@ -1165,13 +1166,15 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
       
   EndSelect
   
+  ;}-
+  
   ProcedureReturn FileContent
   
 EndProcedure
 
 Procedure LoadConfig()
   
-  Protected Filename.s = GetPathPart(ProgramFilename()) + "SpiderBite.cfg"
+  Protected Filename.s = GetExePath() + "SpiderBite.cfg"
   
   If LoadJSON(0, FileName)
     
@@ -1200,7 +1203,7 @@ Procedure Main()
   
   SourceFile.s = ProgramParameter() ; %COMPILEFILE!
   
-  ; SourceFile = "C:\Code\ToolTest\ToolTestPHP.sb"
+  ; SourceFile = "C:\Users\tuebben\AppData\Local\Temp\PB_EditorOutput2.pb"
   
   If SourceFile = "" ; no commandline-parameter
     MessageRequester(#AppName, "SourceFile = ''.")
@@ -1216,34 +1219,36 @@ Procedure Main()
   
   FileContent = LoadTextFile(SourceFile)
   
-  If LoadConfig()
-    
-    GetConstants(FileContent)
-    
-    If ProfileName <> ""
-      
-      If FindMapElement(SpiderBiteCfg(), ProfileName)
-        
-        FileContent = ProcessServerCode(FileContent, #ServerCodeType_PbCgi)
-        FileContent = ProcessServerCode(FileContent, #ServerCodeType_Php)
-        FileContent = ProcessServerCode(FileContent, #ServerCodeType_Aspx)
-        FileContent = ProcessServerCode(FileContent, #ServerCodeType_Asp)
-        ; FileContent = ProcessServerCode(FileContent, #ServerCodeType_Python)
-        ; FileContent = ProcessServerCode(FileContent, #ServerCodeType_NodeJs)
-        
-      Else
-        
-        FileContent = AddCompilerError(FileContent, "Profile '" + ProfileName + "' not found!")
-        
-      EndIf
-      
-    EndIf
-    
-  Else
-    
-    FileContent = AddCompilerError(FileContent, "Couldn't load '" + GetPathPart(ProgramFilename()) + "SpiderBite.cfg!")
-    
+  GetConstants(FileContent)
+  
+  If ProfileName <> ""
+  	
+  	If LoadConfig()
+  		
+  		If FindMapElement(SpiderBiteCfg(), ProfileName)
+  			
+  			FileContent = ProcessServerCode(FileContent, #ServerCodeType_PbCgi)
+  			FileContent = ProcessServerCode(FileContent, #ServerCodeType_Php)
+  			FileContent = ProcessServerCode(FileContent, #ServerCodeType_Aspx)
+  			FileContent = ProcessServerCode(FileContent, #ServerCodeType_Asp)
+  			; FileContent = ProcessServerCode(FileContent, #ServerCodeType_Python)
+				; FileContent = ProcessServerCode(FileContent, #ServerCodeType_NodeJs)
+  			
+  		Else
+  			
+  			FileContent = AddCompilerError(FileContent, "Profile '" + ProfileName + "' not found!")
+  			
+  		EndIf
+  		
+  	Else
+  		
+  		FileContent = AddCompilerError(FileContent, "Couldn't load '" + GetPathPart(ProgramFilename()) + "SpiderBite.cfg!")
+  		
+  	EndIf
+  	
   EndIf
+  
+  Debug FileContent
   
   SaveTextFile(FileContent, SourceFile)
   

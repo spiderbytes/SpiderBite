@@ -39,6 +39,8 @@ Global Dialog
 
 #AppName = "SpiderBiteConfig"
 
+XIncludeFile "includes/functions.pbi"
+
 Enumeration
   #Action_Add = 1
   #Action_Edit
@@ -102,7 +104,7 @@ EndEnumeration
 
 Procedure LoadConfig()
   
-  Protected Filename.s = GetPathPart(ProgramFilename()) + "SpiderBite.cfg"
+  Protected Filename.s = GetExePath() + "SpiderBite.cfg"
   
   If LoadJSON(0, FileName)
     
@@ -114,7 +116,7 @@ EndProcedure
 
 Procedure SaveConfig()
   
-  Protected Filename.s = GetPathPart(ProgramFilename()) + "SpiderBite.cfg"
+  Protected Filename.s = GetExePath() + "SpiderBite.cfg"
   
   If CreateJSON(0)
     

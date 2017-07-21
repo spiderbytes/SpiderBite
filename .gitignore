@@ -62,3 +62,7 @@ Examples/SpiderBasic_Compilation2.html
 Examples/SpiderBasic_Compilation3.html
 Examples/spiderbasic.js
 SpiderBite.cfg
+includes/SpiderBite.sbi.cfg
+system/templates/cgi-ohne-Access-Control-Allow-Origin.pb.cfg
+system/templates/cgi-ohne-Access-Control-Allow-Origin.pb
+system/templates/cgi.pb.cfg
