@@ -1,4 +1,9 @@
-﻿
+﻿CompilerIf #PB_Compiler_OS = #PB_OS_Windows
+  #PathSeparator = "\"
+CompilerElse
+  #PathSeparator = "/"
+CompilerEndIf
+
 Procedure.s GetExePath()
   Protected ExePath.s = GetPathPart(ProgramFilename())
   If LCase(ExePath) = LCase(GetTemporaryDirectory()) : ExePath = GetCurrentDirectory() : EndIf

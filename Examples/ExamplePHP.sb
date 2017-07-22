@@ -4,15 +4,19 @@
 
 Procedure myPhpProcedure3Callback(Success, Result.s)
   
-  Debug Success
-  Debug Result
+  Debug ""
+  Debug "myPhpProcedure3Callback"
+  Debug "Success: " + Success
+  Debug "Result: " + Result
   
 EndProcedure
 
 Procedure myPhpProcedure4Callback(Success, Result.s)
   
-  Debug Success
-  Debug Result
+  Debug ""
+  Debug "myPhpProcedure4Callback"
+  Debug "Success: " + Success
+  Debug "Result: " + Result
   
 EndProcedure
 

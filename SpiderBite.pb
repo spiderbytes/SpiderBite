@@ -898,12 +898,34 @@ EndProcedure
 
 Procedure.s RemoveCodeIdentifier(CodeBlock.s, ServerCodeType.s)
 	
-	CodeBlock = Mid(CodeBlock, FindString(CodeBlock, "Enable" + ServerCodeType) + Len("Enable" + ServerCodeType))
+	CodeBlock = Mid(CodeBlock, FindString(CodeBlock, "Enable" + ServerCodeType, 1, #PB_String_NoCase) + Len("Enable" + ServerCodeType))
 	
-	CodeBlock = Left(CodeBlock, FindString(CodeBlock, "Disable" + ServerCodeType) - 1)
+	CodeBlock = Left(CodeBlock, FindString(CodeBlock, "Disable" + ServerCodeType, 1, #PB_String_NoCase) - 1)
 	
 	ProcedureReturn CodeBlock
 	
+EndProcedure
+
+Procedure.s GetParentPath(Path.s)
+  
+  Protected ParentPath.s
+  Protected Counter
+  Protected PathSeparator.s
+  
+  If FindString(Path, "\")
+    PathSeparator = "\"
+  ElseIf FindString(Path, "/")
+    PathSeparator = "/"
+  Else
+    ProcedureReturn ParentPath
+  EndIf
+  
+  For Counter = 1 To CountString(Path, PathSeparator) - 1
+    ParentPath + StringField(Path, Counter, PathSeparator) + PathSeparator
+  Next
+  
+  ProcedureReturn ParentPath
+  
 EndProcedure
 
 Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
@@ -979,6 +1001,7 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   Protected CodeBlock.s
   Protected ClientProcedures.s = ""
   Protected ServerCode.s
+  Protected CurrentProcedure.s
   
   Protected regex_SC
   Protected regex_P
@@ -996,8 +1019,10 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   	ExamineRegularExpression(regex_P, CodeBlock)
   	
   	While NextRegularExpressionMatch(regex_P)
-  		
-  		ClientProcedures + StringField(RegularExpressionMatchString(regex_P), 1, #LF$) + #LF$
+  	  
+  	  CurrentProcedure = RegularExpressionMatchString(regex_P)
+  	  
+  		ClientProcedures + StringField(CurrentProcedure, 1, #LF$) + #LF$
   		
   		Protected dataType.s
   		Protected processData.s
@@ -1007,7 +1032,7 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   		
   		Protected CallbackProcedure.s
   		
-  		CallbackProcedure = StringField(ClientProcedures, 1, "(")
+  		CallbackProcedure = StringField(CurrentProcedure, 1, "(")
   		CallbackProcedure = Trim(StringField(CallbackProcedure, CountString(CallbackProcedure, " ") + 1, " "))
   		CallbackProcedure + "Callback"
   		CallbackProcedure = "f_" + LCase(CallbackProcedure)
@@ -1049,7 +1074,7 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   	ServerCode + RemoveCodeIdentifier(CodeBlock, ServerCodeType) + #LF$
   	
   Wend
-  
+    
   FreeRegularExpression(regex_SC)
   
   ;{
@@ -1078,18 +1103,13 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
       SaveTextFile(TemplateCode, ServerFilename)
       
     Case #ServerCodeType_PbCgi
+      RequestSelect = GetRequestSelect4PbCgi(ServerCode)
+      ServerCode = ConvertToPbCgi(ServerCode)
+      TemplateCode = LoadTextFile(TemplateFilename)
+      TemplateCode = ReplaceString(TemplateCode, "; ### ServerCode ###", ServerCode)
+      TemplateCode = ReplaceString(TemplateCode, "; ### RequestSelect ###", RequestSelect)
       
       Protected CgiTempFilename.s
-      
-      ServerCode = ConvertToPbCgi(ServerCode)
-      
-      RequestSelect = GetRequestSelect4PbCgi(ServerCode)
-      
-      TemplateCode = LoadTextFile(TemplateFilename)
-      
-      TemplateCode = ReplaceString(TemplateCode, "; ### ServerCode ###", ServerCode)
-      
-      TemplateCode = ReplaceString(TemplateCode, "; ### RequestSelect ###", RequestSelect)
       
       CgiTempFilename = GetPathPart(SourceFile) + "tempcgi.pb"
       
@@ -1115,14 +1135,25 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
         
       ForEver
       
-      Protected Compiler = RunProgram(Chr(34) + SpiderBiteCfg(ProfileName)\PbCompiler    + Chr(34) + " " + 
-                                      Chr(34) + CgiTempFilename            + Chr(34) + " /CONSOLE /EXE " +
-                                      Chr(34) + ServerFilename + Chr(34),
-                                      "",
+      Protected PbCompiler.s = SpiderBiteCfg(ProfileName)\PbCompiler
+      
+      CompilerIf #PB_Compiler_OS = #PB_OS_Windows
+        PbCompiler      = Chr(34) + PbCompiler + Chr(34)
+        CgiTempFilename = Chr(34) + CgiTempFilename + Chr(34)
+        ServerFilename  = Chr(34) + ServerFilename + Chr(34)
+        #Params = " /CONSOLE /EXE "
+      CompilerElse
+        #Params = " -e "
+      CompilerEndIf
+      
+      SetEnvironmentVariable("PUREBASIC_HOME", GetParentPath(GetPathPart(SpiderBiteCfg(ProfileName)\PbCompiler)))
+      
+      Protected Compiler = RunProgram(PbCompiler,
+                                      CgiTempFilename + #Params + ServerFilename,
                                       "",
                                       #PB_Program_Open | #PB_Program_Read | #PB_Program_Hide)
       
-      Protected ExitCode = 1
+      Protected ExitCode
       
       If Compiler
         
@@ -1140,7 +1171,7 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
         
         If ExitCode <> 0
           
-          FileContent = AddCompilerError(FileContent, "Something went wrong :-(" + RemoveString(ProgramOutput, #CRLF$))
+          FileContent = AddCompilerError(FileContent, "Something went wrong :-(" + ReplaceString(ProgramOutput, #CRLF$, " / "))
           
         EndIf
         
@@ -1205,6 +1236,8 @@ Procedure Main()
   
   ; SourceFile = "C:\Users\tuebben\AppData\Local\Temp\PB_EditorOutput2.pb"
   
+  ; SourceFile = "/tmp/PB_EditorOutput2.pb"
+  
   If SourceFile = "" ; no commandline-parameter
     MessageRequester(#AppName, "SourceFile = ''.")
     End
@@ -1248,7 +1281,7 @@ Procedure Main()
   	
   EndIf
   
-  Debug FileContent
+  ; Debug FileContent
   
   SaveTextFile(FileContent, SourceFile)
   
