@@ -20,7 +20,7 @@ DisablePbCgi
 Debug myPbCgiProcedure()
 ```
 
-Der Code, der oben in dem EnablePbCgi/DisablePbCgi - Block notiert ist, wird vor dem eigentlichen Konvertierungsvorgang durch SpiderBite extrahiert und in eine eigene PureBasic-Executable kompiliert (eine sogenannte CGI-EXE), die dann auf dem Server ausgeführt wird. Hierbei steht im ServerCode-Block der gesamte PureBasic-Befehlsvorrat zur Verfügung.
+Der Code, der oben in dem `EnablePbCgi/DisablePbCgi` - Block notiert ist, wird vor dem eigentlichen Konvertierungsvorgang durch SpiderBite extrahiert und in eine eigene PureBasic-Executable kompiliert (eine sogenannte CGI-EXE), die dann auf dem Server ausgeführt wird. Hierbei steht im ServerCode-Block der gesamte PureBasic-Befehlsvorrat zur Verfügung.
 
 Neben der Möglichkeit, PureBasic-CGI zu erstellen stehen auch Blockbereiche für PHP, ASP und ASPX zur Verfügung. Ein Beispiel für PHP:
 
@@ -40,18 +40,18 @@ Blockbereiche für NodeJs und Python sind in Planung.
 
 ## Installation
 
-GitHub-Kenner klonen sich diese Projekt auf Ihren Datenträger an einen Ort ihrer Wahl. Menschen, die sich nicht mit GitHub auskennen, haben sie Möglichkeit, sich die Sourcen als ZIP herunterzuladen:
+GitHub-Kenner klonen sich dieses Projekt auf Ihren Datenträger an einen Ort ihrer Wahl. Menschen, die sich nicht mit GitHub auskennen, haben sie Möglichkeit, sich die Sourcen als ZIP herunterzuladen:
 
 ![](http://i.imgur.com/2SxgUyA.png)
 
-Danach müssen die PB-Sourcen (SpiderBite.pb und SpiderBiteConfig.pb) mit PureBasic kompiliert werden.
+Danach müssen die PB-Sourcen (`SpiderBite.pb` und `SpiderBiteConfig.pb`) mit PureBasic kompiliert werden.
 
 Sobald das geschehen ist, wird SpiderBite als SpiderBasic-Tool installiert:
 
 ![](http://i.imgur.com/shOpccz.png)
 
-Es ist darauf zu achten, dass als Übergabeparameter "%COMPILEFILE" angegeben wird.
-Ebenso sollten die beiden Checkboxen "Wait until tool quits" und "Hide tool from the Main menu" aktiviert sein.
+Es ist darauf zu achten, dass als Übergabeparameter "`%COMPILEFILE`" angegeben wird.
+Ebenso sollten die beiden Checkboxen "`Wait until tool quits`" und "`Hide tool from the Main menu`" aktiviert sein.
 
 ![](http://i.imgur.com/tHOv1M2.png)
 
@@ -65,7 +65,7 @@ Mit SpiderBiteConfig können Profile angelegt werden, die dann im SpiderBasic-Co
 
 ![](http://i.imgur.com/zg9aw5y.png)
 
-Soll beispielsweise ein PureBasic-CGI erstellt werden, so muss in SpiderBiteConfig festgelegt werden, wo sich der PureBasic-Compiler befindet. Des weiteren muss angegeben werden, wo das CGI gespeichert werden soll (PbCgiServerFilename) und wie es vom Browser aus aufgerufen werden kann (PbCgiServerAddress). Schlussendlich kann ein Template ausgewählt werden, welches als Grundlage für das zu erstellende CGI verwendet wird. Wird kein Template angegeben, so wird ein Standard-Template verwendet.
+Soll beispielsweise ein PureBasic-CGI erstellt werden, so muss in SpiderBiteConfig festgelegt werden, wo sich der PureBasic-Compiler befindet. Des weiteren muss angegeben werden, wo das CGI gespeichert werden soll (`PbCgiServerFilename`) und wie es vom Browser aus aufgerufen werden kann (`PbCgiServerAddress`). Schlussendlich kann ein Template ausgewählt werden, welches als Grundlage für das zu erstellende CGI verwendet wird. Wird kein Template angegeben, so wird ein Standard-Template verwendet.
 
 ```
 #SpiderBite_Profile = "default"
