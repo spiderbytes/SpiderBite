@@ -41,9 +41,10 @@ Structure sSpiderBiteCfg
   
 EndStructure
 
-Global NewMap SpiderBiteCfg.sSpiderBiteCfg()
+Global SpiderBite_Profile.s
+Global SpiderBite_ByPass
 
-Global ProfileName.s
+Global NewMap SpiderBiteCfg.sSpiderBiteCfg()
 
 XIncludeFile "includes/inc.lexer.pbi"
 XIncludeFile "includes/functions.pbi"
@@ -75,7 +76,7 @@ Procedure CheckNextToken(List TT.Token(), Match.s)
   ProcedureReturn ReturnValue
 EndProcedure
 
-Procedure GetConstants(FileContent.s)
+Procedure GetSpiderByteConstants(FileContent.s)
   
 	Protected Lexer.iPBSC = New_PBSC() 	
 	
@@ -111,8 +112,19 @@ Procedure GetConstants(FileContent.s)
 		      ConstantValue = TT()\Token
 		      
 		      Select LCase(ConstantName)
+		          
 		        Case "#spiderbite_profile"
-		          ProfileName = RemoveString(ConstantValue, Chr(34))
+		          SpiderBite_Profile = RemoveString(ConstantValue, Chr(34))
+		          
+		        Case "#spiderbite_bypass"
+		          
+		          Select LCase(ConstantValue)
+		            Case "1", "#true"
+		              SpiderBite_ByPass = #True
+		            Default
+		              SpiderBite_ByPass = #False
+		          EndSelect
+		          
 		      EndSelect
 		      
 		    EndIf
@@ -943,30 +955,50 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   Select ServerCodeType
       
     Case #ServerCodeType_Asp
-      ServerAddress    = SpiderBiteCfg(ProfileName)\AspServerAddress
-      ServerFilename   = SpiderBiteCfg(ProfileName)\AspServerFilename
-      TemplateFilename = SpiderBiteCfg(ProfileName)\AspTemplate
+      ServerAddress    = SpiderBiteCfg(SpiderBite_Profile)\AspServerAddress
+      ServerFilename   = SpiderBiteCfg(SpiderBite_Profile)\AspServerFilename
+      
+      If SpiderBiteCfg(SpiderBite_Profile)\AspTemplate = ""
+        SpiderBiteCfg(SpiderBite_Profile)\AspTemplate = GetExePath() + "system/templates/asp.asp"
+      EndIf
+      
+      TemplateFilename = SpiderBiteCfg(SpiderBite_Profile)\AspTemplate
       
     Case #ServerCodeType_Aspx
-      ServerAddress    = SpiderBiteCfg(ProfileName)\AspxServerAddress
-      ServerFilename   = SpiderBiteCfg(ProfileName)\AspxServerFilename
-      TemplateFilename = SpiderBiteCfg(ProfileName)\AspxTemplate
+      ServerAddress    = SpiderBiteCfg(SpiderBite_Profile)\AspxServerAddress
+      ServerFilename   = SpiderBiteCfg(SpiderBite_Profile)\AspxServerFilename
+      
+      If SpiderBiteCfg(SpiderBite_Profile)\AspxTemplate = ""
+        SpiderBiteCfg(SpiderBite_Profile)\AspxTemplate = GetExePath() + "system/templates/aspx.aspx"
+      EndIf
+      
+      TemplateFilename = SpiderBiteCfg(SpiderBite_Profile)\AspxTemplate
       
     Case #ServerCodeType_PbCgi
       
-      If FileSize(SpiderBiteCfg(ProfileName)\PbCompiler) = -1
+      If FileSize(SpiderBiteCfg(SpiderBite_Profile)\PbCompiler) = -1
         FileContent = AddCompilerError(FileContent, "PbCompiler not set")
         ProcedureReturn FileContent
       EndIf
       
-      ServerAddress    = SpiderBiteCfg(ProfileName)\PbCgiServerAddress
-      ServerFilename   = SpiderBiteCfg(ProfileName)\PbCgiServerFilename
-      TemplateFilename = SpiderBiteCfg(ProfileName)\PbCgiTemplate
+      ServerAddress    = SpiderBiteCfg(SpiderBite_Profile)\PbCgiServerAddress
+      ServerFilename   = SpiderBiteCfg(SpiderBite_Profile)\PbCgiServerFilename
+      
+      If SpiderBiteCfg(SpiderBite_Profile)\PbCgiTemplate = ""
+        SpiderBiteCfg(SpiderBite_Profile)\PbCgiTemplate = GetExePath() + "system/templates/cgi.pb"
+      EndIf
+      
+      TemplateFilename = SpiderBiteCfg(SpiderBite_Profile)\PbCgiTemplate
       
     Case #ServerCodeType_Php
-      ServerAddress    = SpiderBiteCfg(ProfileName)\PhpServerAddress
-      ServerFilename   = SpiderBiteCfg(ProfileName)\PhpServerFilename
-      TemplateFilename = SpiderBiteCfg(ProfileName)\PhpTemplate
+      ServerAddress    = SpiderBiteCfg(SpiderBite_Profile)\PhpServerAddress
+      ServerFilename   = SpiderBiteCfg(SpiderBite_Profile)\PhpServerFilename
+      
+      If SpiderBiteCfg(SpiderBite_Profile)\PhpTemplate = ""
+        SpiderBiteCfg(SpiderBite_Profile)\PhpTemplate = GetExePath() + "system/templates/php.php"
+      EndIf
+      
+      TemplateFilename = SpiderBiteCfg(SpiderBite_Profile)\PhpTemplate
       
     Case #ServerCodeType_NodeJs
       FileContent = AddCompilerWarning(FileContent, "NodeJs is not supported (yet)")
@@ -1074,131 +1106,133 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   	ServerCode + RemoveCodeIdentifier(CodeBlock, ServerCodeType) + #LF$
   	
   Wend
-    
+  
   FreeRegularExpression(regex_SC)
   
   ;{
   
-  ; ----------------------------------------------------------------------
-  
-  Protected RequestSelect.s
-  Protected TemplateCode.s
-  
-  Select ServerCodeType
-      
-    Case #ServerCodeType_Asp
-      RequestSelect = GetRequestSelect4ASP(ServerCode)
-      ServerCode = ConvertToASP(ServerCode)
-      TemplateCode = LoadTextFile(TemplateFilename)
-      TemplateCode = ReplaceString(TemplateCode, "' ### ServerCode ###", ServerCode)
-      TemplateCode = ReplaceString(TemplateCode, "' ### RequestSelect ###", RequestSelect)
-      SaveTextFile(TemplateCode, ServerFilename)
-      
-    Case #ServerCodeType_Aspx
-      RequestSelect = GetRequestSelect4ASPX(ServerCode)
-      ServerCode = ConvertToASPX(ServerCode)
-      TemplateCode = LoadTextFile(TemplateFilename)
-      TemplateCode = ReplaceString(TemplateCode, "' ### ServerCode ###", ServerCode)
-      TemplateCode = ReplaceString(TemplateCode, "' ### RequestSelect ###", RequestSelect)
-      SaveTextFile(TemplateCode, ServerFilename)
-      
-    Case #ServerCodeType_PbCgi
-      RequestSelect = GetRequestSelect4PbCgi(ServerCode)
-      ServerCode = ConvertToPbCgi(ServerCode)
-      TemplateCode = LoadTextFile(TemplateFilename)
-      TemplateCode = ReplaceString(TemplateCode, "; ### ServerCode ###", ServerCode)
-      TemplateCode = ReplaceString(TemplateCode, "; ### RequestSelect ###", RequestSelect)
-      
-      Protected CgiTempFilename.s
-      
-      CgiTempFilename = GetPathPart(SourceFile) + "tempcgi.pb"
-      
-      SaveTextFile(TemplateCode, CgiTempFilename)
-      
-      Protected FileDeleteCounter = 0
-      
-      Repeat
+  If SpiderBite_ByPass = #False
+    
+    Protected RequestSelect.s
+    Protected TemplateCode.s
+    
+    Select ServerCodeType
         
-        If FileSize(ServerFilename) = -1
-          Break
-        EndIf
+      Case #ServerCodeType_Asp
+        RequestSelect = GetRequestSelect4ASP(ServerCode)
+        ServerCode = ConvertToASP(ServerCode)
+        TemplateCode = LoadTextFile(TemplateFilename)
+        TemplateCode = ReplaceString(TemplateCode, "' ### ServerCode ###", ServerCode)
+        TemplateCode = ReplaceString(TemplateCode, "' ### RequestSelect ###", RequestSelect)
+        SaveTextFile(TemplateCode, ServerFilename)
         
-        DeleteFile(ServerFilename)
+      Case #ServerCodeType_Aspx
+        RequestSelect = GetRequestSelect4ASPX(ServerCode)
+        ServerCode = ConvertToASPX(ServerCode)
+        TemplateCode = LoadTextFile(TemplateFilename)
+        TemplateCode = ReplaceString(TemplateCode, "' ### ServerCode ###", ServerCode)
+        TemplateCode = ReplaceString(TemplateCode, "' ### RequestSelect ###", RequestSelect)
+        SaveTextFile(TemplateCode, ServerFilename)
         
-        FileDeleteCounter + 1
+      Case #ServerCodeType_PbCgi
+        RequestSelect = GetRequestSelect4PbCgi(ServerCode)
+        ServerCode = ConvertToPbCgi(ServerCode)
+        TemplateCode = LoadTextFile(TemplateFilename)
+        TemplateCode = ReplaceString(TemplateCode, "; ### ServerCode ###", ServerCode)
+        TemplateCode = ReplaceString(TemplateCode, "; ### RequestSelect ###", RequestSelect)
         
-        If FileDeleteCounter > 9
-          Break
-        EndIf
+        Protected CgiTempFilename.s
         
-        Delay(500)
+        CgiTempFilename = GetPathPart(SourceFile) + "tempcgi.pb"
         
-      ForEver
-      
-      Protected PbCompiler.s = SpiderBiteCfg(ProfileName)\PbCompiler
-      
-      CompilerIf #PB_Compiler_OS = #PB_OS_Windows
-        PbCompiler      = Chr(34) + PbCompiler + Chr(34)
-        CgiTempFilename = Chr(34) + CgiTempFilename + Chr(34)
-        ServerFilename  = Chr(34) + ServerFilename + Chr(34)
-        #Params = " /CONSOLE /EXE "
-      CompilerElse
-        #Params = " -e "
-      CompilerEndIf
-      
-      SetEnvironmentVariable("PUREBASIC_HOME", GetParentPath(GetPathPart(SpiderBiteCfg(ProfileName)\PbCompiler)))
-      
-      Protected Compiler = RunProgram(PbCompiler,
-                                      CgiTempFilename + #Params + ServerFilename,
-                                      "",
-                                      #PB_Program_Open | #PB_Program_Read | #PB_Program_Hide)
-      
-      Protected ExitCode
-      
-      If Compiler
+        SaveTextFile(TemplateCode, CgiTempFilename)
         
-        Protected ProgramOutput.s
+        Protected FileDeleteCounter = 0
         
-        While ProgramRunning(Compiler)
-          If AvailableProgramOutput(Compiler)
-            ProgramOutput + ReadProgramString(Compiler) + #CRLF$
+        Repeat
+          
+          If FileSize(ServerFilename) = -1
+            Break
           EndIf
-        Wend
-        
-        ExitCode = ProgramExitCode(Compiler)
-        
-        CloseProgram(Compiler) ; Close the connection to the program
-        
-        If ExitCode <> 0
           
-          FileContent = AddCompilerError(FileContent, "Something went wrong :-(" + ReplaceString(ProgramOutput, #CRLF$, " / "))
+          DeleteFile(ServerFilename)
           
-        EndIf
+          FileDeleteCounter + 1
+          
+          If FileDeleteCounter > 9
+            Break
+          EndIf
+          
+          Delay(500)
+          
+        ForEver
         
-      Else
+        Protected PbCompiler.s = SpiderBiteCfg(SpiderBite_Profile)\PbCompiler
         
-        FileContent = AddCompilerError(FileContent, "Couldn't start Pbcompiler.")
+        CompilerIf #PB_Compiler_OS = #PB_OS_Windows
+          PbCompiler      = Chr(34) + PbCompiler + Chr(34)
+          CgiTempFilename = Chr(34) + CgiTempFilename + Chr(34)
+          ServerFilename  = Chr(34) + ServerFilename + Chr(34)
+          #Params = " /CONSOLE /EXE "
+        CompilerElse
+          #Params = " -e "
+        CompilerEndIf
         
-      EndIf			  
-      
-      ; DeleteFile(CgiTempFilename)
-      
-    Case #ServerCodeType_Php
-      ServerCode = ConvertToPHP(ServerCode)
-      TemplateCode = LoadTextFile(TemplateFilename)
-      TemplateCode = ReplaceString(TemplateCode, "// ### ServerCode ###", ServerCode)
-      SaveTextFile(TemplateCode, ServerFilename)
-      
-    Case #ServerCodeType_Python
-      ; not yet
-      
-    Case #ServerCodeType_NodeJs
-      ; not yet
-      
-  EndSelect
+        SetEnvironmentVariable("PUREBASIC_HOME", GetParentPath(GetPathPart(SpiderBiteCfg(SpiderBite_Profile)\PbCompiler)))
+        
+        Protected Compiler = RunProgram(PbCompiler,
+                                        CgiTempFilename + #Params + ServerFilename,
+                                        "",
+                                        #PB_Program_Open | #PB_Program_Read | #PB_Program_Hide)
+        
+        Protected ExitCode
+        
+        If Compiler
+          
+          Protected ProgramOutput.s
+          
+          While ProgramRunning(Compiler)
+            If AvailableProgramOutput(Compiler)
+              ProgramOutput + ReadProgramString(Compiler) + #CRLF$
+            EndIf
+          Wend
+          
+          ExitCode = ProgramExitCode(Compiler)
+          
+          CloseProgram(Compiler) ; Close the connection to the program
+          
+          If ExitCode <> 0
+            
+            FileContent = AddCompilerError(FileContent, "Something went wrong :-(" + ReplaceString(ProgramOutput, #CRLF$, " / "))
+            
+          EndIf
+          
+        Else
+          
+          FileContent = AddCompilerError(FileContent, "Couldn't start Pbcompiler.")
+          
+        EndIf			  
+        
+        ; DeleteFile(CgiTempFilename)
+        
+      Case #ServerCodeType_Php
+        ServerCode = ConvertToPHP(ServerCode)
+        TemplateCode = LoadTextFile(TemplateFilename)
+        TemplateCode = ReplaceString(TemplateCode, "// ### ServerCode ###", ServerCode)
+        SaveTextFile(TemplateCode, ServerFilename)
+        
+      Case #ServerCodeType_Python
+        ; not yet
+        
+      Case #ServerCodeType_NodeJs
+        ; not yet
+        
+    EndSelect
+    
+  EndIf
   
   ;}-
-  
+    
   ProcedureReturn FileContent
   
 EndProcedure
@@ -1252,13 +1286,13 @@ Procedure Main()
   
   FileContent = LoadTextFile(SourceFile)
   
-  GetConstants(FileContent)
+  GetSpiderByteConstants(FileContent)
   
-  If ProfileName <> ""
+  If SpiderBite_Profile <> ""
   	
   	If LoadConfig()
   		
-  		If FindMapElement(SpiderBiteCfg(), ProfileName)
+  		If FindMapElement(SpiderBiteCfg(), SpiderBite_Profile)
   			
   			FileContent = ProcessServerCode(FileContent, #ServerCodeType_PbCgi)
   			FileContent = ProcessServerCode(FileContent, #ServerCodeType_Php)
@@ -1269,7 +1303,7 @@ Procedure Main()
   			
   		Else
   			
-  			FileContent = AddCompilerError(FileContent, "Profile '" + ProfileName + "' not found!")
+  			FileContent = AddCompilerError(FileContent, "Profile '" + SpiderBite_Profile + "' not found!")
   			
   		EndIf
   		
