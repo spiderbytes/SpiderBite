@@ -36,7 +36,34 @@ DisablePHP
 Debug myPhpProcedure()
 ```
 
+Es ist möglich unterschiedliche Blockbereiche in einem Source zu nutzen (hier: PbCgi und PHP):
+
+```
+EnablePbCgi
+  Procedure.s myPbCgiProcedure()
+    ProcedureReturn "Hello from myPbCgiProcedure"
+  EndProcedure
+DisablePbCgi
+
+EnablePHP
+  Procedure.s myPhpProcedure()
+    ! return "Hello from myPhpProcedure";
+  EndProcedure
+DisablePHP
+
+Debug myPbCgiProcedure()
+Debug myPhpProcedure()
+```
+
 Blockbereiche für NodeJs und Python sind in Planung.
+
+## Systemvoraussetzungen
+
+* SpiderBasic
+
+* PureBasic (um die Sourcen zu kompilieren und für den Fall, dass PB Cgi erstellt werden sollen)
+
+* Einen beliebigen Webserver (Apache, IIS, nginx, ...)
 
 ## Installation
 
@@ -67,17 +94,17 @@ Mit SpiderBiteConfig können Profile angelegt werden, die dann im SpiderBasic-Co
 
 Soll beispielsweise ein PureBasic-CGI erstellt werden, so muss in SpiderBiteConfig festgelegt werden, wo sich der PureBasic-Compiler befindet. Des weiteren muss angegeben werden, wo das CGI gespeichert werden soll (`PbCgiServerFilename`) und wie es vom Browser aus aufgerufen werden kann (`PbCgiServerAddress`). Schlussendlich kann ein Template ausgewählt werden, welches als Grundlage für das zu erstellende CGI verwendet wird. Wird kein Template angegeben, so wird ein Standard-Template verwendet.
 
+Des weiteren muss die Datei `SpiderBite.sbi` eingebunden werden. Sie befindet sich im `include` - Ordner
+
 ```
-#SpiderBite_Profile = "default"
+XIncludeFile "../includes/SpiderBite.sbi"
+
+#SpiderBite_Profile = "default" ; hiermit wird das Profil angegeben
 
 EnablePbCgi
-
-  ; der Code in diesem Block wird auf dem Server ausgeführt
-
   Procedure.s myPbCgiProcedure()
     ProcedureReturn "Hello from myPbCgiProcedure"
   EndProcedure
-
 DisablePbCgi
 
 Debug myPbCgiProcedure()

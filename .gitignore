@@ -66,3 +66,4 @@ includes/SpiderBite.sbi.cfg
 system/templates/cgi-ohne-Access-Control-Allow-Origin.pb.cfg
 system/templates/cgi-ohne-Access-Control-Allow-Origin.pb
 system/templates/cgi.pb.cfg
+Examples/ExampleMixed.sb.cfg

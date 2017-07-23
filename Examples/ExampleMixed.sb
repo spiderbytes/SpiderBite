@@ -1,0 +1,23 @@
+﻿XIncludeFile "../includes/SpiderBite.sbi"
+
+#SpiderBite_Profile = "default"
+
+EnablePbCgi
+  
+  Procedure.s myPbCgiProcedure()
+    ProcedureReturn "Hello from myPbCgiProcedure"
+  EndProcedure
+  
+DisablePbCgi
+
+EnablePHP
+  
+  Procedure.s myPhpProcedure()
+    ! return "Hello from myPhpProcedure";
+  EndProcedure
+  
+DisablePHP
+
+Debug myPbCgiProcedure()
+Debug myPhpProcedure()
+
