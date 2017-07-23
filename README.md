@@ -129,4 +129,5 @@ Debug myPbCgiProcedure()
 
 # Lizenz
 
-[MIT](License)
+## License
+[MIT](https://github.com/spiderbytes/SpiderBite/blob/master/LICENSE)
