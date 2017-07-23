@@ -1,22 +1,66 @@
-﻿XIncludeFile "../includes/SpiderBite.sbi"
+XIncludeFile "../includes/SpiderBite.sbi"
 
 #SpiderBite_Profile = "default"
 
-EnablePbCgi
-  
   Procedure.s myPbCgiProcedure()
-    ProcedureReturn "Hello from myPbCgiProcedure"
-  EndProcedure
-  
-DisablePbCgi
+ ! var returnValue; 
+ ! [].unshift.call(arguments, arguments.callee.name.substring(2)); 
+ ! var async; 
+ ! var successFunction; 
+ ! var errorFunction; 
+ ! if (typeof f_mypbcgiprocedurecallback == 'function') { 
+ !   async = true; 
+ ! 	successFunction = function(result) { f_mypbcgiprocedurecallback(true, result); }; 
+ ! 	errorFunction = function(a,b,c) { f_mypbcgiprocedurecallback(false, b + '/' + c); }; 
+ ! } else { 
+ !   async = false; 
+ ! 	successFunction = function(result) { returnValue = result; };
+ ! 	errorFunction = function(a,b,c) { returnValue = 'error: ' + b + '/' + c; };
+ ! }
+ ! $.ajax({ 
+ ! 	url: 'http://spiderbytes.tuebben.de/demos/testcgi/testcgi.exe', 
+ ! 	type: 'POST', 
+ ! 	data: arguments, 
+ ! 	dataType: 'text', 
+ ! 	processData: true, 
+ ! 	async: async, 
+ ! 	cache: false, 
+ ! 	success: successFunction, 
+ ! 	error: errorFunction 
+ ! }); 
+ ! return returnValue; 
+EndProcedure
 
-EnablePHP
-  
+
   Procedure.s myPhpProcedure()
-    ! return "Hello from myPhpProcedure";
-  EndProcedure
-  
-DisablePHP
+ ! var returnValue; 
+ ! [].unshift.call(arguments, arguments.callee.name.substring(2)); 
+ ! var async; 
+ ! var successFunction; 
+ ! var errorFunction; 
+ ! if (typeof f_myphpprocedurecallback == 'function') { 
+ !   async = true; 
+ ! 	successFunction = function(result) { f_myphpprocedurecallback(true, result); }; 
+ ! 	errorFunction = function(a,b,c) { f_myphpprocedurecallback(false, b + '/' + c); }; 
+ ! } else { 
+ !   async = false; 
+ ! 	successFunction = function(result) { returnValue = result; };
+ ! 	errorFunction = function(a,b,c) { returnValue = 'error: ' + b + '/' + c; };
+ ! }
+ ! $.ajax({ 
+ ! 	url: 'http://localhost/test.php', 
+ ! 	type: 'POST', 
+ ! 	data: arguments, 
+ ! 	dataType: 'text', 
+ ! 	processData: true, 
+ ! 	async: async, 
+ ! 	cache: false, 
+ ! 	success: successFunction, 
+ ! 	error: errorFunction 
+ ! }); 
+ ! return returnValue; 
+EndProcedure
+
 
 Debug myPbCgiProcedure()
 Debug myPhpProcedure()

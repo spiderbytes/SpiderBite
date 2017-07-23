@@ -121,6 +121,12 @@ Debug myPbCgiProcedure()
 
 {ToDo}
 
+## ToDo
+
+* Funktioniert noch nicht, wenn man eine WebApp erstellen möchte.
+
+* Momentan sind nur einfache Übergabeparameter erlaubt.
+
 # Lizenz
 
 MIT-Lizenz
