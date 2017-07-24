@@ -127,7 +127,6 @@ Debug myPbCgiProcedure()
 
 * Momentan sind nur einfache Übergabeparameter erlaubt.
 
-# Lizenz
+## Lizenz
 
-## License
 [MIT](https://github.com/spiderbytes/SpiderBite/blob/master/LICENSE)

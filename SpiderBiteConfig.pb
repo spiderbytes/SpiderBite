@@ -86,8 +86,10 @@ Runtime Enumeration
   #winConfig_cmdNodeJsFilename
   #winConfig_txtNodeJsServerAddress
   
-  #winConfig_txtPythonFilename
-  #winConfig_cmdPythonFilename
+  #winConfig_txtPythonTemplate
+  #winConfig_cmdPythonTemplate
+  #winConfig_txtPythonServerFilename
+  #winConfig_cmdPythonServerFilename
   #winConfig_txtPythonServerAddress
   
   #winConfig_cmdOK
@@ -158,30 +160,46 @@ Runtime Procedure winConfig_ChoosePathEvent()
     Case #winConfig_cmdAspxServerFilename
       Filename = GetGadgetText(#winConfig_txtAspxServerFilename)
       
+    Case #winConfig_cmdPythonTemplate
+      Filename = GetGadgetText(#winConfig_txtPythonTemplate)
+    Case #winConfig_cmdPythonServerFilename
+      Filename = GetGadgetText(#winConfig_txtPythonServerFilename)
+      
   EndSelect
   
   SelectedFilename = OpenFileRequester("Please choose a file", Filename, "All files (*.*)|*.*", 0)
   
   If SelectedFilename
     Select EventGadget()
+        
       Case #winConfig_cmdPbCompiler
         SetGadgetText(#winConfig_txtPbCompiler, SelectedFilename)
+        
       Case #winConfig_cmdPbCgiTemplate
         SetGadgetText(#winConfig_txtPbCgiTemplate, SelectedFilename)
       Case #winConfig_cmdPbCgiServerFilename
         SetGadgetText(#winConfig_txtPbCgiServerFilename, SelectedFilename)
+        
       Case #winConfig_cmdPhpTemplate
         SetGadgetText(#winConfig_txtPhpTemplate, SelectedFilename)
       Case #winConfig_cmdPhpServerFilename
         SetGadgetText(#winConfig_txtPhpServerFilename, SelectedFilename)
+        
       Case #winConfig_cmdAspTemplate
         SetGadgetText(#winConfig_txtAspTemplate, SelectedFilename)
       Case #winConfig_cmdAspServerFilename
         SetGadgetText(#winConfig_txtAspServerFilename, SelectedFilename)
+        
       Case #winConfig_cmdAspxTemplate
         SetGadgetText(#winConfig_txtAspxTemplate, SelectedFilename)
       Case #winConfig_cmdAspxServerFilename
         SetGadgetText(#winConfig_txtAspxServerFilename, SelectedFilename)
+        
+      Case #winConfig_cmdPythonTemplate
+        SetGadgetText(#winConfig_txtPythonTemplate, SelectedFilename)
+      Case #winConfig_cmdPythonServerFilename
+        SetGadgetText(#winConfig_txtPythonServerFilename, SelectedFilename)
+        
     EndSelect
   EndIf
   
@@ -290,18 +308,26 @@ Runtime Procedure winConfig_cmdOK_Event()
   EndSelect
   
   SpiderBiteCfg(ProfileName)\PbCompiler          = GetGadgetText(#winConfig_txtPbCompiler)
-  SpiderBiteCfg(ProfileName)\PbCgiTemplate       = GetGadgetText(#winConfig_txtPbCgiTemplate)
-  SpiderBiteCfg(ProfileName)\PbCgiServerFilename = GetGadgetText(#winConfig_txtPbCgiServerFilename)
-  SpiderBiteCfg(ProfileName)\PbCgiServerAddress  = GetGadgetText(#winConfig_txtPbCgiServerAddress)
-  SpiderBiteCfg(ProfileName)\PhpTemplate         = GetGadgetText(#winConfig_txtPhpTemplate)
-  SpiderBiteCfg(ProfileName)\PhpServerFilename   = GetGadgetText(#winConfig_txtPhpServerFilename)
-  SpiderBiteCfg(ProfileName)\PhpServerAddress    = GetGadgetText(#winConfig_txtPhpServerAddress)
-  SpiderBiteCfg(ProfileName)\AspTemplate         = GetGadgetText(#winConfig_txtAspTemplate)
-  SpiderBiteCfg(ProfileName)\AspServerFilename   = GetGadgetText(#winConfig_txtAspServerFilename)
-  SpiderBiteCfg(ProfileName)\AspServerAddress    = GetGadgetText(#winConfig_txtAspServerAddress)
-  SpiderBiteCfg(ProfileName)\AspxTemplate        = GetGadgetText(#winConfig_txtAspxTemplate)
-  SpiderBiteCfg(ProfileName)\AspxServerFilename  = GetGadgetText(#winConfig_txtAspxServerFilename)
-  SpiderBiteCfg(ProfileName)\AspxServerAddress   = GetGadgetText(#winConfig_txtAspxServerAddress)  
+  
+  SpiderBiteCfg(ProfileName)\PbCgiTemplate        = GetGadgetText(#winConfig_txtPbCgiTemplate)
+  SpiderBiteCfg(ProfileName)\PbCgiServerFilename  = GetGadgetText(#winConfig_txtPbCgiServerFilename)
+  SpiderBiteCfg(ProfileName)\PbCgiServerAddress   = GetGadgetText(#winConfig_txtPbCgiServerAddress)
+  
+  SpiderBiteCfg(ProfileName)\PhpTemplate          = GetGadgetText(#winConfig_txtPhpTemplate)
+  SpiderBiteCfg(ProfileName)\PhpServerFilename    = GetGadgetText(#winConfig_txtPhpServerFilename)
+  SpiderBiteCfg(ProfileName)\PhpServerAddress     = GetGadgetText(#winConfig_txtPhpServerAddress)
+  
+  SpiderBiteCfg(ProfileName)\AspTemplate          = GetGadgetText(#winConfig_txtAspTemplate)
+  SpiderBiteCfg(ProfileName)\AspServerFilename    = GetGadgetText(#winConfig_txtAspServerFilename)
+  SpiderBiteCfg(ProfileName)\AspServerAddress     = GetGadgetText(#winConfig_txtAspServerAddress)
+  
+  SpiderBiteCfg(ProfileName)\AspxTemplate         = GetGadgetText(#winConfig_txtAspxTemplate)
+  SpiderBiteCfg(ProfileName)\AspxServerFilename   = GetGadgetText(#winConfig_txtAspxServerFilename)
+  SpiderBiteCfg(ProfileName)\AspxServerAddress    = GetGadgetText(#winConfig_txtAspxServerAddress)  
+  
+  SpiderBiteCfg(ProfileName)\PythonTemplate       = GetGadgetText(#winConfig_txtPythonTemplate)
+  SpiderBiteCfg(ProfileName)\PythonServerFilename = GetGadgetText(#winConfig_txtPythonServerFilename)
+  SpiderBiteCfg(ProfileName)\PythonServerAddress  = GetGadgetText(#winConfig_txtPythonServerAddress)  
   
   SaveConfig()
   
@@ -358,6 +384,10 @@ Runtime Procedure winMain_cmdEdit_Event()
   SetGadgetText(#winConfig_txtAspxTemplate, SpiderBiteCfg(SelectedProfile)\AspxTemplate)
   SetGadgetText(#winConfig_txtAspxServerFilename, SpiderBiteCfg(SelectedProfile)\AspxServerFilename)
   SetGadgetText(#winConfig_txtAspxServerAddress, SpiderBiteCfg(SelectedProfile)\AspxServerAddress)  
+  
+  SetGadgetText(#winConfig_txtPythonTemplate, SpiderBiteCfg(SelectedProfile)\PythonTemplate)
+  SetGadgetText(#winConfig_txtPythonServerFilename, SpiderBiteCfg(SelectedProfile)\PythonServerFilename)
+  SetGadgetText(#winConfig_txtPythonServerAddress, SpiderBiteCfg(SelectedProfile)\PythonServerAddress)  
   
 EndProcedure
 

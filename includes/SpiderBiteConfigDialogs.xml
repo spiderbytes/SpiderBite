@@ -119,7 +119,27 @@
 					</vbox>
 				</tab>
 				<tab text='Python'>
-					<text text='not supported yet' />
+					<vbox expand='item:4'>
+						<vbox>
+							<text text='PythonServerFilename:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtPythonServerFilename' />
+								<button text='...' id='#winConfig_cmdPythonServerFilename' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<vbox>
+							<text text='PythonServerAddress:' />
+							<string height='22' id='#winConfig_txtPythonServerAddress' />
+						</vbox>
+						<vbox>
+							<text text='PythonTemplate:' />
+							<hbox expand='item:1'>
+								<string height='22' id='#winConfig_txtPythonTemplate' />
+								<button text='...' id='#winConfig_cmdPythonTemplate' onevent='winConfig_ChoosePathEvent()'  />
+							</hbox>
+						</vbox>
+						<empty />
+					</vbox>
 				</tab>
 				<tab text='NodeJS'>
 					<text text='not supported yet' />
