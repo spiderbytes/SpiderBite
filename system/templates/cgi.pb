@@ -4,11 +4,14 @@ If Not InitCGI() Or Not ReadCGI()
   End 
 EndIf
 
-Global PB_CGI_HeaderContentType.s = ""
-Global PB_CGI_HeaderLocation.s = ""
+Global PB_CGI_HeaderContentType.s        = ""
+Global PB_CGI_HeaderLocation.s           = ""
+Global PB_CGI_AccessControlAllowOrigin.s = ""
 
-PB_CGI_HeaderContentType.s = "text/plain;charset=UTF-8"
-PB_CGI_HeaderContentType.s = "text/plain"
+; ---
+
+PB_CGI_AccessControlAllowOrigin = "*"
+PB_CGI_HeaderContentType = "text/plain;charset=UTF-8"
 
 ; ------------------
 ; ### ServerCode ###
@@ -27,7 +30,9 @@ If PB_CGI_HeaderLocation <> ""
   WriteCGIHeader(#PB_CGI_HeaderLocation, PB_CGI_HeaderLocation)
 EndIf
 
-WriteCGIHeader("Access-Control-Allow-Origin", "*")
+If PB_CGI_AccessControlAllowOrigin <> ""
+  WriteCGIHeader("Access-Control-Allow-Origin", PB_CGI_AccessControlAllowOrigin)
+EndIf
 
 WriteCGIHeader(#PB_CGI_HeaderContentType, PB_CGI_HeaderContentType, #PB_CGI_LastHeader)
 
