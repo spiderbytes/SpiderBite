@@ -4,14 +4,14 @@ If Not InitCGI() Or Not ReadCGI()
   End 
 EndIf
 
-Global PB_CGI_HeaderContentType.s        = ""
-Global PB_CGI_HeaderLocation.s           = ""
-Global PB_CGI_AccessControlAllowOrigin.s = ""
+Global SpiderBite_Header_ContentType.s        = ""
+Global SpiderBite_Header_Location.s           = ""
+Global SpiderBite_Header_AccessControlAllowOrigin.s = ""
 
 ; ---
 
-PB_CGI_AccessControlAllowOrigin = "*"
-PB_CGI_HeaderContentType = "text/plain;charset=UTF-8"
+SpiderBite_Header_AccessControlAllowOrigin = "*"
+SpiderBite_Header_ContentType = "text/plain;charset=UTF-8"
 
 ; ------------------
 ; ### ServerCode ###
@@ -26,14 +26,14 @@ Define ReturnValue.s
 ; ---------------------
 
 
-If PB_CGI_HeaderLocation <> ""
-  WriteCGIHeader(#PB_CGI_HeaderLocation, PB_CGI_HeaderLocation)
+If SpiderBite_Header_Location <> ""
+  WriteCGIHeader(#PB_CGI_HeaderLocation, SpiderBite_Header_Location)
 EndIf
 
-If PB_CGI_AccessControlAllowOrigin <> ""
-  WriteCGIHeader("Access-Control-Allow-Origin", PB_CGI_AccessControlAllowOrigin)
+If SpiderBite_Header_AccessControlAllowOrigin <> ""
+  WriteCGIHeader("Access-Control-Allow-Origin", SpiderBite_Header_AccessControlAllowOrigin)
 EndIf
 
-WriteCGIHeader(#PB_CGI_HeaderContentType, PB_CGI_HeaderContentType, #PB_CGI_LastHeader)
+WriteCGIHeader(#PB_CGI_HeaderContentType, SpiderBite_Header_ContentType, #PB_CGI_LastHeader)
 
 WriteCGIString(ReturnValue)
