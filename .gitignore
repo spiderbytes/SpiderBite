@@ -45,26 +45,15 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-Examples/ExampleASP.sb.cfg
-Examples/ExampleASPX.sb.cfg
-Examples/ExamplePbCgi.sb.cfg
-Examples/ExamplePHP.sb.cfg
-SpiderBite.exe
-SpiderBite.pb.cfg
-SpiderBiteConfig.pb.cfg
-PureBasic_Compilation0.exe
-SpiderBiteConfig.exe
-includes/functions.pbi.cfg
-SpiderBiteConfig.json
+*.sb.cfg
+*.sbi.cfg
+*.pb.cfg
+*.pbi.cfg
+*.exe
 Examples/SpiderBasic_Compilation0.html
 Examples/SpiderBasic_Compilation1.html
 Examples/SpiderBasic_Compilation2.html
 Examples/SpiderBasic_Compilation3.html
 Examples/spiderbasic.js
 SpiderBite.cfg
-includes/SpiderBite.sbi.cfg
-system/templates/cgi-ohne-Access-Control-Allow-Origin.pb.cfg
-system/templates/cgi-ohne-Access-Control-Allow-Origin.pb
-system/templates/cgi.pb.cfg
-Examples/ExampleMixed.sb.cfg
 Examples/tempcgi.pb

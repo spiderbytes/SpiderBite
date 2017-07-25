@@ -408,8 +408,8 @@ Procedure.s ConvertToASPX(Code.s)
 						inProcedure = #True
 						
 						If CheckNextToken(TT(), ".")
-						  NextElement(TT())
-						  NextElement(TT())
+						  NextElement(TT()) : TT()\Token = ""
+						  NextElement(TT()) : TT()\Token = ""
 						EndIf
 						
 						NextElement(TT())

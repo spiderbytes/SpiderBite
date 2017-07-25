@@ -1,7 +1,9 @@
 <?php
 
-header("Access-Control-Allow-Origin: *");
-header('Content-Type: text/plain');
+// header("Access-Control-Allow-Origin: *");
+// header("Access-Control-Allow-Methods: GET,PUT,POST,DELETE,PATCH,OPTIONS");
+// header('Content-Type: text/plain');
+
 
 // processing PostData:
 
@@ -9,7 +11,13 @@ $PostData = file_get_contents("php://input");
 parse_str($PostData, $PostParams);
 $params = array_values($PostParams);
 
-$request = array_shift($params);
+// processing Get-Request (if any)
+
+$request = $_GET["request"];
+
+if (!$request) {
+	$request = array_shift($params);
+}
 
 if (!function_exists($request)) die("invalid request: '" . $request . "'");
 
