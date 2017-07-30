@@ -115,7 +115,59 @@ Debug myPbCgiProcedure()
 
 ## Synchrone Kommunikation vs Asynchrone Kommunikation
 
-{ToDo}
+SpiderBite verwendet für die Kommunikation zwischen Client (Browser) und Server Ajax-Aufrufe. Diese können synchron und asynchron erfolgen.
+
+Der Vorteil eines synchronen Aufrufes ist, dass der Rückgabewert in der gleichen Zeile zur Verfügung steht, in der die Funktion aufgerufen wird.
+
+Synchroner Aufruf:
+```
+Enable*
+  Procedure.s myProcedure()
+    ProcedureReturn "Hello World"
+  EndProcedure
+Disable*
+
+Debug myProcedure() ; hier kann die Rückgabe ausgewertet werden.
+```
+
+Der Nachteil eines synchronen Aufrufes besteht darin, dass der Code so lange in der Zeile des Aufrufes wartet, bis der Server den Rückgabewert liefert.
+
+Das kann dazu führen, dass der Browser nicht mehr reagiert, wenn der Server zu lange benötigt, um den Rückgabewert zu liefern (beispielsweise bei einer schlechten Verbindung zwischen Client und Server oder bei langen Laufzeiten von Prozeduren).
+
+Aus diesem Grund wird empfohlen, asynchrone Aufrufe zu verwenden. Das hat zwar mehr Programmieraufwand zur Folge, resultiert aber in einem jederzeit reagierenden Browser.
+
+Ein asynchroner Aufruf erfolgt, wenn sich im Client-Code eine Prozedur gleichen Namens mit angehängtem ```Callback``` befindet:
+
+Server-Code: ```myProcedure()```
+
+Client-Code: ```myProcedureCallback()```
+
+Ein asynchroner Aufruf sähe dementsprechend so aus:
+```
+Procedure myProcedureCallback(Success, Result.s)
+  Debug Result ; hier wird der Rückgabewert des Aufrufes
+               ; myProcedure() geliefert.
+EndProcedure
+
+Enable*
+  Procedure.s myProcedure()
+    ProcedureReturn "Hello World"
+  EndProcedure
+Disable*
+
+myProcedure() ; hier wird kein Rückgabewert geliefert!
+
+If 1=2
+  myProcedureCallback(0, "") ; ein 'Blind'-Aufruf
+EndIf
+```
+
+**Wichtig:** SpiderBasic optimiert den Code. Ungenutze Prozeduren werden nicht mitkompiliert. Da SpiderBite den im ServerCode-Block befindlichen Aufruf von ```myProcedureCallback``` durch einen Ajax-Aufruf ersetzt, 'denkt' SpiderBasic, dass die Prozedur nicht aufgerufen wird. Demzufolge wird sie von SpiderBasic entfernt. Aus diesem Grund müssen wir den Aufruf an anderer Stelle simulieren:
+```
+If 1=2
+  myProcedureCallback(0, "") ; ein 'Blind'-Aufruf
+EndIf
+```
 
 ## Templates
 
