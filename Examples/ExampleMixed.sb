@@ -1,4 +1,7 @@
-XIncludeFile "../includes/SpiderBite.sbi"
+; either include "SpiderBite.sbi":
+; XIncludeFile "[YourPathTo]/SpiderBite.sbi"
+;
+; ... or copy "SpiderBite.res" to SpiderBasics Residents-Folder
 
 #SpiderBite_Profile = "default"
 

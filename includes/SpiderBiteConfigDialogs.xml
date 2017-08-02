@@ -1,6 +1,7 @@
 <dialogs>
 	<window id='#winMain' name='winMain' text='SpiderBiteConfig' minwidth='300' minheight='300' flags='#PB_Window_ScreenCentered | #PB_Window_SystemMenu | #PB_Window_SizeGadget'>
 		<container>
+			<vbox expand='item:1'>
 			<hbox expand='item:1'>
 				<listview id='#winMain_lstProfiles' onevent='winMain_lstProfiles_Event()' />
 				<vbox expand='item:4'>
@@ -10,6 +11,12 @@
 					<empty />
 				</vbox>
 			</hbox>
+			<empty />
+			<hbox expand='item:1'>
+				<text text='' id='#winMain_txtProfileName' flags='#PB_Text_Border'></text>
+				<button text="Copy to clipboard" id='#winMain_cmdCopyToClipboard' onevent='winMain_cmdCopyToClipboard_Event()' />
+			</hbox>
+			</vbox>			
 		</container>
 	</window> 
 	<window id='#winConfig' name='winConfig' text='' minwidth='640' minheight='480' flags='#PB_Window_ScreenCentered | #PB_Window_SystemMenu | #PB_Window_SizeGadget'>

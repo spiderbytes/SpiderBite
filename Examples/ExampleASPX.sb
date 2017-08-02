@@ -1,18 +1,25 @@
-﻿XIncludeFile "../includes/SpiderBite.sbi"
+﻿; either include "SpiderBite.sbi":
+; XIncludeFile "[YourPathTo]/SpiderBite.sbi"
+;
+; ... or copy "SpiderBite.res" to SpiderBasics Residents-Folder
 
 #SpiderBite_Profile = "default"
 
 Procedure myASPXProcedure3Callback(Success, Result.s)
   
-  Debug Success
-  Debug Result
+  Debug ""
+  Debug "myASPXProcedure3Callback"
+  Debug "Success: " + Success
+  Debug "Result: " + Result
   
 EndProcedure
 
 Procedure myASPXProcedure4Callback(Success, Result.s)
   
-  Debug Success
-  Debug Result
+  Debug ""
+  Debug "myASPXProcedure4Callback"
+  Debug "Success: " + Success
+  Debug "Result: " + Result
   
 EndProcedure
 

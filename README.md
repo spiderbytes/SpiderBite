@@ -97,10 +97,10 @@ Mit SpiderBiteConfig können Profile angelegt werden, die dann im SpiderBasic-Co
 
 Soll beispielsweise ein PureBasic-CGI erstellt werden, so muss in SpiderBiteConfig festgelegt werden, wo sich der PureBasic-Compiler befindet. Des weiteren muss angegeben werden, wo das CGI gespeichert werden soll (`PbCgiServerFilename`) und wie es vom Browser aus aufgerufen werden kann (`PbCgiServerAddress`). Schlussendlich kann ein Template ausgewählt werden, welches als Grundlage für das zu erstellende CGI verwendet wird. Wird kein Template angegeben, so wird ein Standard-Template verwendet.
 
-Des weiteren muss die Datei `SpiderBite.sbi` eingebunden werden. Sie befindet sich im `include` - Ordner
+Des weiteren muss die Datei `SpiderBite.sbi` eingebunden werden. Sie befindet sich im `include` - Ordner.
 
 ```
-XIncludeFile "../includes/SpiderBite.sbi"
+XIncludeFile "[PathTo]/SpiderBite.sbi"
 
 #SpiderBite_Profile = "default" ; hiermit wird das Profil angegeben
 
@@ -112,6 +112,8 @@ DisablePbCgi
 
 Debug myPbCgiProcedure()
 ```
+
+Alternativ kann die Datei `SpiderBite.res` in den Residents-Ordner von SpiderBasic kopiert werden.
 
 ## Synchrone Kommunikation vs Asynchrone Kommunikation
 

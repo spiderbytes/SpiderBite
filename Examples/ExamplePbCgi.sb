@@ -1,4 +1,7 @@
-﻿XIncludeFile "../includes/SpiderBite.sbi"
+﻿; either include "SpiderBite.sbi":
+; XIncludeFile "[YourPathTo]/SpiderBite.sbi"
+;
+; ... or copy "SpiderBite.res" to SpiderBasics Residents-Folder
 
 #SpiderBite_Profile = "default"
 
@@ -15,15 +18,6 @@ Procedure myPbCgiProcedure4Callback(Success, Result.s)
   
   Debug ""
   Debug "myPbCgiProcedure4Callback"
-  Debug "Success: " + Success
-  Debug "Result: " + Result
-  
-EndProcedure
-
-Procedure ReadFromFileCallback(Success, Result.s)
-  
-  Debug ""
-  Debug "ReadFromFileCallback"
   Debug "Success: " + Success
   Debug "Result: " + Result
   
@@ -47,38 +41,6 @@ EnablePbCgi
     ProcedureReturn "Hello from " + Message
   EndProcedure
   
-  Procedure WriteToFile(Filename.s, StringToWrite.s)
-    
-    Protected FF
-    
-    FF = CreateFile(#PB_Any, Filename, #PB_Ascii)
-    
-    If FF
-      WriteString(FF, StringToWrite) 
-      CloseFile(FF)
-    Else
-      ; "Couldn't create file"
-    EndIf
-    
-  EndProcedure
-  
-  Procedure.s ReadFromFile(Filename.s)
-    
-    Protected FF
-    Protected ReturnValue.s
-    
-    FF = ReadFile(#PB_Any, Filename)
-    If FF
-      ReturnValue = ReadString(FF)
-      CloseFile(FF)
-    Else
-      ReturnValue = "Couldn't read file"
-    EndIf
-    
-    ProcedureReturn ReturnValue
-    
-  EndProcedure  
-  
 DisablePbCgi
 
 Debug myPbCgiProcedure1()                    ; without callback, without parameter
@@ -87,39 +49,7 @@ Debug myPbCgiProcedure2("myPbCgiProcedure2") ; without callback, with parameter
 myPbCgiProcedure3()                    ; with callback, without parameter
 myPbCgiProcedure4("myPbCgiProcedure4") ; with callback, with parameter
 
-WriteToFile("test.txt", "Timestamp: " + Str(Date()))
-ReadFromFile("test.txt")
-
 If 1=2
   myPbCgiProcedure3Callback(0, "")
   myPbCgiProcedure4Callback(0, "")
-  ReadFromFileCallback(0, "")
 EndIf
-
-; PbCgiProcedureDLL.s DatabaseOperation()
-;   
-;   Protected ReturnValue.s
-;   
-;   UseSQLiteDatabase()
-;   
-;   OpenDatabase(0, ":memory:", "", "", #PB_Database_SQLite)
-;   
-;   DatabaseUpdate(0, "Create Table myTable (myField1)")
-;   
-;   DatabaseUpdate(0, "Insert Into myTable (myField1) Values ('myValue1')")
-;   DatabaseUpdate(0, "Insert Into myTable (myField1) Values ('myValue2')")
-;   DatabaseUpdate(0, "Insert Into myTable (myField1) Values ('myValue3')")
-;   
-;   DatabaseQuery(0, "Select myField1 From myTable")
-;   
-;   While NextDatabaseRow(0)
-;     
-;     ReturnValue + GetDatabaseString(0, 0) + #CRLF$
-;     
-;   Wend
-;   
-;   CloseDatabase(0)
-;   
-;   ProcedureReturn ReturnValue
-;   
-; EndProcedure

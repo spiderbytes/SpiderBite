@@ -101,6 +101,8 @@ Runtime Enumeration
   #winMain_cmdAdd
   #winMain_cmdEdit
   #winMain_cmdDelete
+  #winMain_txtProfileName
+  #winMain_cmdCopyToClipboard
   
 EndEnumeration
 
@@ -216,6 +218,12 @@ Procedure CheckButtons()
   DisableGadget(#winMain_cmdEdit, Flag)
   DisableGadget(#winMain_cmdDelete, Flag)
   
+  If Flag = #False
+    SetGadgetText(#winMain_txtProfileName, "#SpiderBite_Profile = " + Chr(34) + GetGadgetText(#winMain_lstProfiles) + Chr(34))
+  Else
+    SetGadgetText(#winMain_txtProfileName, "")
+  EndIf
+
 EndProcedure
 
 Procedure ReFillProfileList(ProfileName.s = "")
@@ -407,6 +415,10 @@ Runtime Procedure winMain_cmdDelete_Event()
   
   ReFillProfileList()
   
+EndProcedure
+
+Runtime Procedure winMain_cmdCopyToClipboard_Event()
+  SetClipboardText(GetGadgetText(#winMain_txtProfileName))
 EndProcedure
 
 Procedure winMain_Close()

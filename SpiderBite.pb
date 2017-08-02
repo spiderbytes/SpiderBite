@@ -3,6 +3,7 @@
 Global SourceFile.s
 
 #AppName = "SpiderBite"
+#AppVersion = "2017-07-30"
 
 #ServerCodeType_NodeJs = "NodeJs"
 #ServerCodeType_Php    = "Php"
@@ -58,7 +59,7 @@ EndStructure
 Global NewList Token.Token()
  
 Procedure.s AddCompilerError(FileContent.s, Message.s)
-  FileContent = "CompilerError " + Chr(34) + Message + Chr(34) + #CRLF$ + FileContent
+  FileContent = "CompilerError " + Chr(34) + "SpiderBite: " + Message + Chr(34) + #CRLF$ + FileContent
   ProcedureReturn FileContent
 EndProcedure
 
@@ -1264,11 +1265,10 @@ Procedure Main()
       
     EndIf
     
+    ; Debug FileContent
+    SaveTextFile(FileContent, SourceFile)
+    
   EndIf
-  
-  Debug FileContent
-  
-  SaveTextFile(FileContent, SourceFile)
   
 EndProcedure
 
