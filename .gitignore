@@ -50,10 +50,7 @@ Temporary Items
 *.pb.cfg
 *.pbi.cfg
 *.exe
-Examples/SpiderBasic_Compilation0.html
-Examples/SpiderBasic_Compilation1.html
-Examples/SpiderBasic_Compilation2.html
-Examples/SpiderBasic_Compilation3.html
-Examples/spiderbasic.js
+*.js
+*temp*.*
+SpiderBasic_Compilation*.html
 SpiderBite.cfg
-Examples/tempcgi.pb
