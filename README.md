@@ -74,18 +74,35 @@ GitHub-Kenner klonen sich dieses Projekt auf Ihren Datenträger an einen Ort ihr
 
 ![](http://i.imgur.com/2SxgUyA.png)
 
-Danach müssen die PB-Sourcen (`SpiderBite.pb` und `SpiderBiteConfig.pb`) mit PureBasic kompiliert werden.
+Danach müssen die PB-Sourcen (`SpiderBite.pb`, `SpiderBiteAfterCreateApp.pb` und `SpiderBiteConfig.pb`) mit PureBasic kompiliert werden und als Tools in SpiderBasic eingerichtet werden.
 
-Sobald das geschehen ist, wird SpiderBite als SpiderBasic-Tool installiert:
+### SpiderBite als SpiderBasic-Tools einrichten
 
-![](http://i.imgur.com/shOpccz.png)
+Nachdem die Sourcen kompiliert wurden, wird SpiderBite als SpiderBasic-Tools installiert. Es ist darauf zu achten, dass als Übergabeparameter "`%COMPILEFILE`" angegeben wird. Ebenso sollten die beiden Checkboxen "`Wait until tool quits`" und "`Hide tool from the Main menu`" aktiviert sein.
 
-Es ist darauf zu achten, dass als Übergabeparameter "`%COMPILEFILE`" angegeben wird.
-Ebenso sollten die beiden Checkboxen "`Wait until tool quits`" und "`Hide tool from the Main menu`" aktiviert sein.
+#### Before Compile / Run
 
-![](http://i.imgur.com/tHOv1M2.png)
+Dieses Tool tritt in Aktion, wenn in SpiderBasic `Compile/Run` aufgerufen wird. Also jedes Mal, wenn `<F5>` gedrückt wird.
 
-SpiderBiteConfig kann optional ebenfalls als Tool installiert werden, um die Konfigurationen komfortabel aus SpiderBasic heraus zu verwalten.
+![](http://i.imgur.com/sTWcQmD.png)
+
+#### Before Create App
+
+Dieses Tool tritt in Aktion, wenn in SpiderBasic `Create App...` aufgerufen wird, um eine App zu erstellen.
+
+![](http://i.imgur.com/xVk67QQ.png)
+
+#### After Create App
+
+**Wichtig!** Aufgrund eines Fehlers in SpiderBasic wird nicht das erzeugte Temp-File als Grundlage für die zu erstellende App verwendet, sondern der Original-Source. Bis dieser Fehler behoben wird, muss hier ein wenig getrickst werden und ein separates Programm (`SpiderBiteAfterCreateApp.exe`) als Tool eingerichtet werden.
+
+![](http://i.imgur.com/oXpURyf.png)
+
+##
+
+Und so sieht es dann aus, wenn alle Tools richtig eingetragen sind:
+
+![](http://i.imgur.com/GUKiyFb.png)
 
 ## SpiderBiteConfig
 
@@ -114,6 +131,8 @@ Debug myPbCgiProcedure()
 ```
 
 Alternativ kann die Datei `SpiderBite.res` in den Residents-Ordner von SpiderBasic kopiert werden.
+
+SpiderBiteConfig kann optional ebenfalls als Tool installiert werden, um die Konfigurationen komfortabel aus SpiderBasic heraus zu verwalten.
 
 ## Synchrone Kommunikation vs Asynchrone Kommunikation
 
@@ -164,7 +183,7 @@ If 1=2
 EndIf
 ```
 
-**Wichtig:** SpiderBasic optimiert den Code. Ungenutze Prozeduren werden nicht mitkompiliert. Da SpiderBite den im ServerCode-Block befindlichen Aufruf von ```myProcedureCallback``` durch einen Ajax-Aufruf ersetzt, 'denkt' SpiderBasic, dass die Prozedur nicht aufgerufen wird. Demzufolge wird sie von SpiderBasic entfernt. Aus diesem Grund müssen wir den Aufruf an anderer Stelle simulieren:
+**Wichtig:** SpiderBasic optimiert den Code. Ungenutzte Prozeduren werden nicht mitkompiliert. Da SpiderBite den im ServerCode-Block befindlichen Aufruf von `myProcedureCallback` durch einen Ajax-Aufruf ersetzt, 'denkt' SpiderBasic, dass die Prozedur nicht aufgerufen wird. Demzufolge wird sie von SpiderBasic entfernt. Aus diesem Grund müssen wir den Aufruf an anderer Stelle simulieren:
 ```
 If 1=2
   myProcedureCallback(0, "") ; ein 'Blind'-Aufruf
@@ -177,9 +196,13 @@ EndIf
 
 ## ToDo
 
-* Funktioniert noch nicht, wenn man eine WebApp erstellen möchte.
+* Momentan sind nur einfache Übergabeparameter (Zeichenketten und Zahlen) erlaubt.
 
-* Momentan sind nur einfache Übergabeparameter erlaubt.
+## Fragen? Anregungen? Fehlermeldungen?
+
+[SpiderBasic-Forum (englisch)](http://forums.spiderbasic.com/index.php)
+
+[SpiderBasic-Forum (deutsch)](http://www.purebasic.fr/german/viewforum.php?f=33)
 
 ## Lizenz
 

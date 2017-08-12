@@ -1,5 +1,5 @@
 <dialogs>
-	<window id='#winMain' name='winMain' text='SpiderBiteConfig' minwidth='300' minheight='300' flags='#PB_Window_ScreenCentered | #PB_Window_SystemMenu | #PB_Window_SizeGadget'>
+	<window id='#winMain' name='winMain' text='SpiderBiteConfig' minwidth='400' minheight='300' flags='#PB_Window_ScreenCentered | #PB_Window_SystemMenu | #PB_Window_SizeGadget'>
 		<container>
 			<vbox expand='item:1'>
 			<hbox expand='item:1'>
@@ -13,7 +13,7 @@
 			</hbox>
 			<empty />
 			<hbox expand='item:1'>
-				<text text='' id='#winMain_txtProfileName' flags='#PB_Text_Border'></text>
+				<string text='' id='#winMain_txtProfileName' flags='#PB_String_ReadOnly' />
 				<button text="Copy to clipboard" id='#winMain_cmdCopyToClipboard' onevent='winMain_cmdCopyToClipboard_Event()' />
 			</hbox>
 			</vbox>			

@@ -433,6 +433,8 @@ Procedure winMain_Open()
   
   BindEvent(#PB_Event_CloseWindow, @winMain_Close(), #winMain)
   
+  DisableGadget(#winMain_txtProfileName, #True)
+  
   ReFillProfileList()
   
 EndProcedure

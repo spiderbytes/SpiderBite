@@ -3,7 +3,7 @@
 Global SourceFile.s
 
 #AppName = "SpiderBite"
-#AppVersion = "2017-07-30"
+#AppVersion = "2017-08-12"
 
 #ServerCodeType_NodeJs = "NodeJs"
 #ServerCodeType_Php    = "Php"
@@ -1235,6 +1235,10 @@ Procedure Main()
     MessageRequester(#AppName, "File '" + SourceFile + "' not found.")
     End
   EndIf
+  
+  ; for SpiderBitePostCompile:
+  DeleteFile(SourceFile + ".original")
+  CopyFile(SourceFile, SourceFile + ".original")
   
   FileContent = LoadTextFile(SourceFile)
   
