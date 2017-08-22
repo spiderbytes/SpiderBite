@@ -415,7 +415,7 @@ Procedure.s ConvertToASPX(Code.s)
 						
 						NextElement(TT())
 						
-						TT()\Token = LCase(TT()\Token)
+						; TT()\Token = LCase(TT()\Token)
 						
 					Case "endprocedure"
 						TT()\Token = "End Function"
