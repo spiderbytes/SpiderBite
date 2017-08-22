@@ -198,6 +198,8 @@ EndIf
 
 * Momentan sind nur einfache Übergabeparameter (Zeichenketten und Zahlen) erlaubt.
 
+* ServerCode wird aktuell nicht in inkludierten (`(X)IncludeFile()`) Dateien verarbeitet. Ich habe schon versucht, diesen Umstand mit einem manuellen Compiler-Lauf zu beheben, aber da SpiderBasic das Compiler-Flag `/PREPROCESS` ignoriert ([und Fred meine entsprechende Anfrage im Forum](http://forums.spiderbasic.com/viewtopic.php?f=13&t=1230&p=4283)), werden wir wohl versuchen müssen, damit zu leben...
+
 ## Fragen? Anregungen? Fehlermeldungen?
 
 [SpiderBasic-Forum (englisch)](http://forums.spiderbasic.com/index.php)

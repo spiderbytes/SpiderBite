@@ -3,7 +3,7 @@
 Global SourceFile.s
 
 #AppName = "SpiderBite"
-#AppVersion = "2017-08-12"
+#AppVersion = "2017-08-22"
 
 #ServerCodeType_NodeJs = "NodeJs"
 #ServerCodeType_Php    = "Php"
@@ -1203,27 +1203,71 @@ Procedure LoadConfig()
   
 EndProcedure
 
+Procedure PreProcess(SourceFile.s)
+	
+; 	AddLog("")
+; 	AddLog("Preprocessing. Starting PureBasic...")
+  
+  Protected SbCompiler.s = GetEnvironmentVariable("PB_TOOL_Compiler")
+  
+	Protected Parameter.s = Chr(34) + SourceFile + Chr(34) + " /PREPROCESS " + Chr(34) + SourceFile + ".pp" + Chr(34)
+	
+	MessageRequester("!", SbCompiler + #CRLF$ + Parameter)
+	
+	Protected Compiler = RunProgram(Chr(34) + SbCompiler + Chr(34),
+	                                Parameter, 
+	                                "",
+	                                #PB_Program_Open | #PB_Program_Read | #PB_Program_Hide)
+	
+	
+	
+	Protected ExitCode = 1
+	
+	If Compiler
+		
+		While ProgramRunning(Compiler)
+			;If AvailableProgramOutput(Compiler)
+				; AddLog(ReadProgramString(Compiler))
+			;EndIf
+		Wend
+		
+		ExitCode = ProgramExitCode(Compiler)
+		
+		CloseProgram(Compiler) ; Close the connection to the program
+		
+	Else
+		
+; 		AddLog("")
+; 		AddLog("Something went wrong :-(", 1)
+; 		AddLog("")
+		
+	EndIf
+	
+	If ExitCode = 0
+		
+		; PbFileContent = LoadTextfile(SourceFile + ".pp")
+		
+		ProcedureReturn #True
+		
+	Else
+		
+		; PbFileContent = ""
+		
+		ProcedureReturn #False
+		
+	EndIf  
+	
+EndProcedure
+
 Procedure Main()
   
   Protected FileContent.s
 
   ; Before Compile/Run
   
-  ; %PATH : Path of the current source. Empty if the source wasn't saved yet.
-  ; %FILE : Filename and Path of the current source. Empty if it wasn't saved yet.
-  ; %TEMPFILE : A temporary copy of the source file. You may modify or delete this at will.
-  ; %COMPILEFILE : The temporary file that is sent to the compiler. You can modify it to change the actual compiled source.
-  ; %EXECUTABLE : Before and after Compilation the name of the created executable
-  ; %CURSOR : The current cursor position given as 'LINExCOLUMN' (ie '15x10')
-  ; %SELECTION : The current selection given as 'LINESTARTxCOLUMNSTARTxLINEENDxCOLUMNEND' (ie '15x1x16x5')
-  ; %WORD : The word that is under the current cursor position.
-  ; %HOME : The SpiderBasic directory.
-  ; %PROJECT : The directory where the project file resides if there is an open project.
-  
   SourceFile.s = ProgramParameter() ; %COMPILEFILE!
   
   ; SourceFile = "C:\Users\Administrator\AppData\Local\Temp\14\PB_EditorOutput2.pb"
-  
   ; SourceFile = "/tmp/PB_EditorOutput2.pb"
   
   If SourceFile = "" ; no commandline-parameter
@@ -1239,6 +1283,8 @@ Procedure Main()
   ; for SpiderBitePostCompile:
   DeleteFile(SourceFile + ".original")
   CopyFile(SourceFile, SourceFile + ".original")
+  
+  ; PreProcess(SourceFile)
   
   FileContent = LoadTextFile(SourceFile)
   

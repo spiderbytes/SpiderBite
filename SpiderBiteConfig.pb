@@ -235,7 +235,7 @@ Procedure ReFillProfileList(ProfileName.s = "")
     DummyList() = MapKey(SpiderBiteCfg())
   Next
   
-  SortList(DummyList(), #PB_Sort_Ascending)
+  SortList(DummyList(), #PB_Sort_Ascending | #PB_Sort_NoCase)
   
   ClearGadgetItems(#winMain_lstProfiles)
   
@@ -342,20 +342,25 @@ Runtime Procedure winConfig_cmdOK_Event()
   CloseWindow(#winConfig)
   
   ReFillProfileList(ProfileName)
-
+  
+  DisableWindow(#winMain, #False)
+  
 EndProcedure
 
 Runtime Procedure winConfig_cmdCancel_Event()
   CloseWindow(#winConfig)
+  DisableWindow(#winMain, #False)  
 EndProcedure
 
 Procedure winConfig_Close()
   CloseWindow(#winConfig)
+  DisableWindow(#winMain, #False)
 EndProcedure
 
 Runtime Procedure winMain_cmdAdd_Event()
   Action = #Action_Add
-  OpenXMLDialog(Dialog, DialogXML, "winConfig")
+  DisableWindow(#winMain, #True)
+  OpenXMLDialog(Dialog, DialogXML, "winConfig", #PB_Ignore, #PB_Ignore, #PB_Ignore, #PB_Ignore, WindowID(#winMain))
   SetWindowTitle(#winConfig, "Add profile")
   BindEvent(#PB_Event_CloseWindow, @winConfig_Close(), #winConfig)
   SetActiveGadget(#winConfig_txtProfileName)
@@ -365,7 +370,8 @@ Runtime Procedure winMain_cmdEdit_Event()
   
   Action = #Action_Edit
   
-  OpenXMLDialog(Dialog, DialogXML, "winConfig")
+  DisableWindow(#winMain, #True)
+  OpenXMLDialog(Dialog, DialogXML, "winConfig", #PB_Ignore, #PB_Ignore, #PB_Ignore, #PB_Ignore, WindowID(#winMain))
   
   SetWindowTitle(#winConfig, "Edit profile")
 
@@ -435,7 +441,13 @@ Procedure winMain_Open()
   
   DisableGadget(#winMain_txtProfileName, #True)
   
-  ReFillProfileList()
+  Protected SelectedWord.s = GetEnvironmentVariable("PB_TOOL_Word")
+  
+  If FindMapElement(SpiderBiteCfg(), SelectedWord) = 0
+    SelectedWord = ""
+  EndIf
+  
+  ReFillProfileList(SelectedWord)
   
 EndProcedure
 
