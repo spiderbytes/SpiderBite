@@ -991,13 +991,13 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   		
   		Protected CallbackProcedure.s
   		
-  		CallbackProcedure = StringField(CurrentProcedure, 1, "(")
-  		CallbackProcedure = Trim(StringField(CallbackProcedure, CountString(CallbackProcedure, " ") + 1, " "))
-  		CallbackProcedure + "Callback"
-  		CallbackProcedure = "f_" + LCase(CallbackProcedure)
+  		CurrentProcedure  = StringField(CurrentProcedure, 1, "(")
+  		CurrentProcedure  = Trim(StringField(CurrentProcedure, CountString(CurrentProcedure, " ") + 1, " "))
+  		
+  		CallbackProcedure = "f_" + LCase(CurrentProcedure) + "callback"
   		
   		ClientProcedures + " ! var returnValue; " + #LF$ +
-  		                   " ! [].unshift.call(arguments, arguments.callee.name.substring(2)); " + #LF$ +
+  		                   " ! [].unshift.call(arguments, '" + CurrentProcedure + "'); " + #LF$ +
   		                   " ! var async; " + #LF$ +
   		                   " ! var successFunction; " + #LF$ +
   		                   " ! var errorFunction; " + #LF$ +
