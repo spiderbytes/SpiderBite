@@ -53,5 +53,6 @@ Test/
 *.exe
 *.js
 *temp*.*
+* - Copy.*
 SpiderBasic_Compilation*.html
 SpiderBite.cfg

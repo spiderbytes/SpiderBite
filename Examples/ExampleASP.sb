@@ -1,42 +1,49 @@
-﻿XIncludeFile "../includes/SpiderBite.sbi"
+﻿; either include "SpiderBite.sbi":
+; XIncludeFile "[YourPathTo]/SpiderBite.sbi"
+;
+; ... or copy "SpiderBite.res" to SpiderBasics Residents-Folder
 
 #SpiderBite_Profile = "default"
 
 Procedure myASPProcedure3Callback(Success, Result.s)
   
-  Debug Success
-  Debug Result
+  Debug ""
+  Debug "myASPProcedure3Callback"
+  Debug "Success: " + Success
+  Debug "Result: " + Result
   
 EndProcedure
 
 Procedure myASPProcedure4Callback(Success, Result.s)
   
-  Debug Success
-  Debug Result
+  Debug ""
+  Debug "myASPProcedure4Callback"
+  Debug "Success: " + Success
+  Debug "Result: " + Result
   
 EndProcedure
 
 EnableASP
   
-  Procedure myASPProcedure1()
+  ProcedureDLL myASPProcedure1()
     
     ! myASPProcedure1 = "Hello from myASPProcedure1"
     
   EndProcedure
   
-  Procedure myASPProcedure2(Message.s)
+  ProcedureDLL myASPProcedure2(Message.s)
     
     ! myASPProcedure2 = "Hello from " & Message 
     
   EndProcedure
   
-  Procedure myASPProcedure3()
+  ProcedureDLL myASPProcedure3()
     
     ! myASPProcedure3 = "Hello from myASPProcedure3"
     
   EndProcedure
   
-  Procedure myASPProcedure4(Message.s)
+  ProcedureDLL myASPProcedure4(Message.s)
     
     ! myASPProcedure4 = "Hello from " & Message
     

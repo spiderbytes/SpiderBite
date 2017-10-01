@@ -134,3 +134,55 @@ Procedure SaveTextFile(TextFileContent.s, TextFileName.s, WriteStringFormat = #P
   EndIf
   
 EndProcedure
+
+Procedure.s ParseParameter(sString.s)
+  
+  ; thanks to 'Kurzer'!
+  ; http://www.purebasic.fr/german/viewtopic.php?p=342900#p342900
+  
+  Protected ReturnValue.s
+  
+  Protected.i i, iParsing = 0, iQuote = -1
+  Protected sChar.s{1}
+  
+  ; Den String von links Zeichen für Zeichen scannen
+  For i = 0 To Len(sString) - 1
+    sChar = PeekS(@sString + i*SizeOf(Character), 1)
+    
+    If sChar = "("
+      ; Sobald wir uns zwischen ( und ) befinden, wird die Analyse begonnen
+      If iParsing < 1 : sChar = "" : EndIf
+      iParsing + 1
+    ElseIf sChar = ")"
+      ; Sobald wir uns nicht mehr zwischen ( und ) befinden, wird die Analyse beendet
+      iParsing - 1
+      If iParsing = 0 : Break : EndIf
+    ElseIf sChar = ~"\""
+      ; Innerhalb von Anführungszeichen beachten wir keine Kommas
+      iQuote * -1
+    ElseIf sChar = ~"," And iQuote = -1 And iParsing = 1
+      ; Bei einem Komma außerhalb von Anführungszeichen auf Parsinglevel 1 wechseln wir zum nächsten Arrayeintrag
+      ReturnValue + Chr(1)
+      sChar = ""
+    EndIf
+    
+    ; Zeichenweises Kopieren des Parameters in das aktuelle Array-Element
+    If iParsing > 0
+      ReturnValue + sChar
+    EndIf
+    
+  Next i
+  
+  ProcedureReturn ReturnValue
+  
+  ; For i = 0 To iParamNum
+  ;    Debug ProcedureParams(i)
+  ; Next i
+  
+  ; Extract(~"ProcedureDLL myProcedure(p1, p2, p3.s = \"4,2\") ; just a comment, one, two, three")
+  ; Extract(~"ProcedureDLL myProcedure(p1, p2, p3.s = \"4,2\", p4.s = GetValue(8)) ; just a comment, one, two, three")
+  ; Extract(~"ProcedureDLL myProcedure(p1, p2 = 3.14, p3.s = \"4,2\", p4.s = GetValue(8)) ; just a comment, one, two, three")
+  ; Extract(~"ProcedureDLL myProcedure(p1, p2 = GetString(\"3,14\", \"Test\", 42), p3.s = \"4,2\", p4.s = GetValue(8)) ; just a comment, one, two, three")
+  
+EndProcedure
+

@@ -1,5 +1,9 @@
 # SpiderBite
 
+## Breaking Change
+
+Ab der Version vom 01.10.2017 wird zwischen öffentlichen und privaten Prozeduren unterschieden. Mehr dazu [hier](#Öffentliche-und-private-prozeduren).
+
 ## Was ist das hier?
 
 SpiderBite ist ein Präprozessor für SpiderBasic, der es ermöglicht, in einem Code Bereiche zu markieren, die auf dem WebServer ausgeführt werden (der sogenannte ServerCode (PB2Web-User werden es kennen :wink:)). 
@@ -13,7 +17,7 @@ EnablePbCgi
 
   ; der Code in diesem Block wird auf dem Server ausgeführt
 
-  Procedure.s myPbCgiProcedure()
+  ProcedureDLL.s myPbCgiProcedure()
     ProcedureReturn "Hello from myPbCgiProcedure"
   EndProcedure
 
@@ -29,7 +33,7 @@ Neben der Möglichkeit, PureBasic-CGI zu erstellen stehen auch Blockbereiche fü
 ```
 EnablePHP
   
-  Procedure myPhpProcedure()
+  ProcedureDLL myPhpProcedure()
     ! return "Hello from myPhpProcedure";
   EndProcedure
   
@@ -43,13 +47,13 @@ Es ist möglich unterschiedliche Blockbereiche in einem Source zu nutzen (hier: 
 
 ```
 EnablePbCgi
-  Procedure.s myPbCgiProcedure()
+  ProcedureDLL.s myPbCgiProcedure()
     ProcedureReturn "Hello from myPbCgiProcedure"
   EndProcedure
 DisablePbCgi
 
 EnablePHP
-  Procedure.s myPhpProcedure()
+  ProcedureDLL.s myPhpProcedure()
     ! return "Hello from myPhpProcedure";
   EndProcedure
 DisablePHP
@@ -122,7 +126,7 @@ XIncludeFile "[PathTo]/SpiderBite.sbi"
 #SpiderBite_Profile = "default" ; hiermit wird das Profil angegeben
 
 EnablePbCgi
-  Procedure.s myPbCgiProcedure()
+  ProcedureDLL.s myPbCgiProcedure()
     ProcedureReturn "Hello from myPbCgiProcedure"
   EndProcedure
 DisablePbCgi
@@ -143,7 +147,7 @@ Der Vorteil eines synchronen Aufrufes ist, dass der Rückgabewert in der gleiche
 Synchroner Aufruf:
 ```
 Enable*
-  Procedure.s myProcedure()
+  ProcedureDLL.s myProcedure()
     ProcedureReturn "Hello World"
   EndProcedure
 Disable*
@@ -171,7 +175,7 @@ Procedure myProcedureCallback(Success, Result.s)
 EndProcedure
 
 Enable*
-  Procedure.s myProcedure()
+  ProcedureDLL.s myProcedure()
     ProcedureReturn "Hello World"
   EndProcedure
 Disable*
@@ -188,6 +192,33 @@ EndIf
 If 1=2
   myProcedureCallback(0, "") ; ein 'Blind'-Aufruf
 EndIf
+```
+
+## Öffentliche und private Prozeduren
+
+Ab der Version vom 01.10.2017 wird zwischen öffentlichen und privaten Prozeduren unterschieden. Öffentliche Prozeduren kann man clientseitig aufrufen, private Prozeduren nicht.
+
+Öffentlich Prozeduren werden mit `ProcedureDLL()` angegeben.
+
+Private Prozeduren werden mit `Procedure()` angegeben.
+
+**Beispiel:**
+```
+EnablePbCgi
+
+  Procedure.s myPrivateProcedure()
+    ProcedureReturn "Hello from myPrivateProcedure"
+  EndProcedure
+  
+  ProcedureDLL.s myPublicProcedure()
+    ProcedureReturn "Hello from myPublicProcedure"
+  EndProcedure
+  
+DisablePbCgi
+
+Debug myPublicProcedure()
+
+Debug myPrivateProcedure() ; this will generate the error 'myPrivateProcedure() is not a function, array, list, map or macro.'
 ```
 
 ## Templates

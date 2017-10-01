@@ -1,0 +1,22 @@
+﻿; either include "SpiderBite.sbi":
+; XIncludeFile "[YourPathTo]/SpiderBite.sbi"
+;
+; ... or copy "SpiderBite.res" to SpiderBasics Residents-Folder
+
+#SpiderBite_Profile = "default"
+
+EnablePbCgi
+
+  Procedure.s myPrivateProcedure()
+    ProcedureReturn "Hello from myPrivateProcedure"
+  EndProcedure
+  
+  ProcedureDLL.s myPublicProcedure()
+    ProcedureReturn "Hello from myPublicProcedure"
+  EndProcedure
+  
+DisablePbCgi
+
+Debug myPublicProcedure()
+
+Debug myPrivateProcedure() ; this will generate the error 'myPrivateProcedure() is not a function, array, list, map or macro.'

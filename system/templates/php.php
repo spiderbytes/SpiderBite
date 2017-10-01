@@ -1,6 +1,7 @@
 <?php
 
-// header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: *");
+
 // header("Access-Control-Allow-Methods: GET,PUT,POST,DELETE,PATCH,OPTIONS");
 // header('Content-Type: text/plain');
 
@@ -21,13 +22,17 @@ if (!$request) {
 
 if (!function_exists($request)) die("invalid request: '" . $request . "'");
 
-echo call_user_func_array($request, $params);
+// echo call_user_func_array($request, $params);
 
-die();
+// die();
 
 // -------------------------
 //
 // ### ServerCode ###
+//
+// -------------------------
+//
+// ### RequestSelect ###
 //
 // -------------------------
 

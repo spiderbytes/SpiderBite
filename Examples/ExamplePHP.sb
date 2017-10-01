@@ -25,25 +25,25 @@ EndProcedure
 
 EnablePHP
   
-  Procedure myPhpProcedure1()
+  ProcedureDLL myPhpProcedure1()
     
     ! return "Hello from myPhpProcedure1";
     
   EndProcedure
   
-  Procedure myPhpProcedure2(Message.s)
+  ProcedureDLL myPhpProcedure2(Message.s)
     
     ! return "Hello from " . $Message ;
     
   EndProcedure
   
-  Procedure myPhpProcedure3()
+  ProcedureDLL myPhpProcedure3()
     
     ! return "Hello from myPhpProcedure3";
     
   EndProcedure
   
-  Procedure myPhpProcedure4(Message.s)
+  ProcedureDLL myPhpProcedure4(Message.s)
     
     ! return "Hello from " . $Message ;
     

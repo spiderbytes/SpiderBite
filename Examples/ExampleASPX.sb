@@ -25,25 +25,25 @@ EndProcedure
 
 EnableASPX
   
-  Procedure myASPXProcedure1()
+  ProcedureDLL myASPXProcedure1()
     
     ! return "Hello from myASPXProcedure1"
     
   EndProcedure
   
-  Procedure myASPXProcedure2(Message.s)
+  ProcedureDLL myASPXProcedure2(Message.s)
     
     ! return "Hello from " & Message 
     
   EndProcedure
   
-  Procedure myASPXProcedure3()
+  ProcedureDLL myASPXProcedure3()
     
     ! return "Hello from myASPXProcedure3"
     
   EndProcedure
   
-  Procedure myASPXProcedure4(Message.s)
+  ProcedureDLL myASPXProcedure4(Message.s)
     
     ! return "Hello from " & Message
     

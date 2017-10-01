@@ -3,7 +3,7 @@
 Global SourceFile.s
 
 #AppName = "SpiderBite"
-#AppVersion = "2017-08-22"
+#AppVersion = "2017-10-01"
 
 #ServerCodeType_NodeJs = "NodeJs"
 #ServerCodeType_Php    = "Php"
@@ -135,128 +135,290 @@ Procedure GetSpiderByteConstants(FileContent.s)
 EndProcedure
 
 Procedure.s GetRequestSelect4PbCgi(ServerCode.s)
-    
-  Protected Lexer.iPBSC = New_PBSC() 	
   
-  Protected RequestSelect.s
+  Protected regex_Procedure
   
-  ServerCode = ReplaceString(ServerCode, #CRLF$, #LF$)
+  Protected CurrentProcedure.s
+  Protected ProcedureLine.s
   
-  Lexer\SetFileString(ServerCode)
-  
-  ClearList(Token())
-  
-  ; Token einlesen
-  While Lexer\IsNextToken() 
-    AddElement(Token())
-    Token()\Token = Lexer\GetNextToken() 
-    Token()\Type  = Lexer\GetCurrentType() 
-    Token()\Line = Lexer\GetCurrentLineNb()
-  Wend
-  
-  PBSC_CloseFile(Lexer)
-  
-  Protected *Old_Element
-  Protected isExport
+  Protected ProcIsString
+  Protected ParamIsString
   
   Protected ProcName.s
-  
-  Protected isString
-  
+  Protected RequestSelect.s
   Protected ParamCounter
   
-  ForEach Token()
-  	
-  	Select Token()\Type
-  			
-  		Case #PBSC_Identifier
-  			
-  			If LCase(Token()\Token) = "procedure"
-  				
-  				ParamCounter = 1 ; ParamCounter starts at 1!
-  				
-  				isString = #False
-  				
-  				NextElement(Token())
-  				
-  				If Token()\Token = "."
-  					
-  					NextElement(Token())
-  					
-  					If LCase(Token()\Token) = "s"
-  						isString = #True
-  					EndIf
-  					
-  					NextElement(Token())
-  					
-  				EndIf
-  				
-  				ProcName = Token()\Token
-  				
-  				RequestSelect + #TAB$ + "Case " + Chr(34) + LCase(ProcName) + Chr(34) + #CRLF$
-  				
-  				If isString
-  					RequestSelect + #TAB$ + #TAB$ + "ReturnValue = " + ProcName + "("
-  				Else
-  					RequestSelect + #TAB$ + #TAB$ + "ReturnValue = Str(" + ProcName + "("
-  				EndIf
-  				
-  				NextElement(Token()) ; Klammer auf
-  				NextElement(Token()) ; Klammer zu?
-  				
-  				While Token()\Token <> ")"
-  				  
-  				  Debug "---> " + Token()\Token
-  				  
-  				  If LCase(Token()\Token) = "list" Or 
-  				     LCase(Token()\Token) = "map" Or
-  				     Left(Token()\Token, 1) = "*"
-  				    
-  				    ProcedureReturn "CompilerError: Lists, Maps and Pointers are not allowed (yet)"
-  				    
-  				  EndIf
-  				  
-  					RequestSelect + " CGIParameterValue(" + Chr(34) + Chr(34) + ", " + ParamCounter + "), "
-  					
-  					ParamCounter + 1
-  					
-  					; RequestSelect + " GetValue(" + Chr(34) + Token()\Token + Chr(34) + "), "
-  					
-  					If CheckNextToken(Token(), ".")
-  						NextElement(Token())
-  						NextElement(Token())
-  					EndIf
-  					
-  					If CheckNextToken(Token(), ",")
-  						NextElement(Token())
-  					EndIf
-  					
-  					NextElement(Token())
-  					
-  				Wend
-  				
-  				If EndsWith(Trim(RequestSelect), ",")
-  					RequestSelect = Left(Trim(RequestSelect), Len(Trim(RequestSelect)) - 1)
-  				EndIf
-  				
-  				If isString
-  					RequestSelect + ")" + #CRLF$
-  				Else
-  					RequestSelect + "))" + #CRLF$
-  				EndIf
-  				
-  			EndIf
-  			
-  	EndSelect
-  Next
+  regex_Procedure = CreateRegularExpression(#PB_Any, "^[\t]*[\ ]*ProcedureDLL([\s\S]*?)\(([\s\S]*?)^[\s]*EndProcedure", #PB_RegularExpression_MultiLine | #PB_RegularExpression_NoCase)	
+  
+  If ExamineRegularExpression(regex_Procedure, ServerCode)
+    
+    While NextRegularExpressionMatch(regex_Procedure)
+      
+      CurrentProcedure = RegularExpressionMatchString(regex_Procedure)
+      
+      ProcName = Trim(RemoveString(CurrentProcedure, "ProcedureDLL", #PB_String_NoCase))
+      
+      ProcIsString = #False
+      
+      If Left(ProcName, 2) = ".s"
+        ProcIsString = #True
+        ProcName = Trim(Mid(ProcName, 3))
+      EndIf
+      
+      ProcName = Trim(StringField(ProcName, 1, "("))
+      
+      RequestSelect + #TAB$ + "Case " + Chr(34) + LCase(ProcName) + Chr(34) + #CRLF$
+      
+      If ProcIsString
+        RequestSelect + #TAB$ + #TAB$ + "ReturnValue = " + ProcName + "("
+      Else
+        RequestSelect + #TAB$ + #TAB$ + "ReturnValue = Str(" + ProcName + "("
+      EndIf
+      
+      ProcedureLine = StringField(CurrentProcedure, 1, #LF$)
+      
+      Protected Parameters.s = ParseParameter(ProcedureLine)
+      
+      Protected Parameter.s
+      
+      For ParamCounter = 0 To CountString(Parameters, Chr(1))
+        
+        Parameter = Trim(StringField(Parameters, ParamCounter + 1, Chr(1)))
+        
+        If Parameter <> ""
+          
+          If LCase(Left(Parameter, Len("list"))) = "list" Or 
+             LCase(Left(Parameter, Len("map"))) = "map" Or
+             Left(Parameter, 1) = "*"
+            
+            ProcedureReturn "CompilerError:\n" + ProcName + "\nLists, Maps And Pointers are not allowed (yet)"
+            
+          EndIf
+          
+          ParamIsString = #False
+          
+          Protected P1.s = Trim(StringField(Parameter, 1, "="))
+          
+          If Right(P1, 1) = "$"
+            ParamIsString = #True
+          EndIf
+          
+          Protected P2.s = Trim(StringField(P1, 2, "."))
+          
+          If LCase(P2) = "s"
+            ParamIsString = #True
+          EndIf
+          
+          If ParamIsString
+            RequestSelect + " CGIParameterValue(" + Chr(34) + Chr(34) + ", " + Str(ParamCounter + 1) + "), "
+          Else
+            RequestSelect + " Val(CGIParameterValue(" + Chr(34) + Chr(34) + ", " + Str(ParamCounter + 1) + ")), "
+          EndIf
+          
+        EndIf
+        
+      Next
+      
+      If EndsWith(Trim(RequestSelect), ",")
+        RequestSelect = Left(Trim(RequestSelect), Len(Trim(RequestSelect)) - 1)
+      EndIf
+      
+      If ProcIsString
+        RequestSelect + ")" + #CRLF$
+      Else
+        RequestSelect + "))" + #CRLF$
+      EndIf
+      
+    Wend
+    
+    FreeRegularExpression(regex_Procedure)
+    
+  EndIf
   
   If RequestSelect <> ""
     
-    RequestSelect = " Select Request " + #CRLF$ +
-                    RequestSelect + #CRLF$ +
-                    " Default " + #CRLF$ +
-                    "   ReturnValue = " + Chr(34) + "unknown request: '" + Chr(34) + " + Request + " + Chr(34) + "'" + Chr(34) + #CRLF$ +
-                    " EndSelect"  
+    RequestSelect = "Select Request" + #CRLF$ +
+                    RequestSelect + 
+                    #TAB$ + "Default" + #CRLF$ +
+                    #TAB$ + #TAB$ + "ReturnValue = " + Chr(34) + "unknown request: '" + Chr(34) + " + Request + " + Chr(34) + "'" + Chr(34) + #CRLF$ +
+                    "EndSelect"  
+    
+  EndIf
+  
+  Debug RequestSelect
+  
+  ProcedureReturn RequestSelect
+  
+EndProcedure
+Procedure.s GetRequestSelect4Asp(ServerCode.s)
+  
+  Protected regex_Procedure
+  
+  Protected CurrentProcedure.s
+  Protected ProcedureLine.s
+  
+  Protected ProcName.s
+  Protected RequestSelect.s
+  Protected ParamCounter
+  
+  regex_Procedure = CreateRegularExpression(#PB_Any, "^[\t]*[\ ]*ProcedureDLL([\s\S]*?)\(([\s\S]*?)^[\s]*EndProcedure", #PB_RegularExpression_MultiLine | #PB_RegularExpression_NoCase)	
+  
+  If ExamineRegularExpression(regex_Procedure, ServerCode)
+    
+    While NextRegularExpressionMatch(regex_Procedure)
+      
+      CurrentProcedure = RegularExpressionMatchString(regex_Procedure)
+      
+      ProcName = Trim(RemoveString(CurrentProcedure, "ProcedureDLL", #PB_String_NoCase))
+      
+      If Left(ProcName, 2) = ".s"
+        ProcName = Trim(Mid(ProcName, 3))
+      EndIf
+      
+      ProcName = Trim(StringField(ProcName, 1, "("))
+      
+      RequestSelect + #TAB$ + #TAB$ + "Case " + Chr(34) + LCase(ProcName) + Chr(34) + #CRLF$
+      
+      RequestSelect + #TAB$ + #TAB$ + #TAB$ + "Response.Write " + ProcName + "("
+      
+      ProcedureLine = StringField(CurrentProcedure, 1, #LF$)
+      
+      Protected Parameters.s = ParseParameter(ProcedureLine)
+      
+      Protected Parameter.s
+      
+      For ParamCounter = 0 To CountString(Parameters, Chr(1))
+        
+        Parameter = Trim(StringField(Parameters, ParamCounter + 1, Chr(1)))
+        
+        If Parameter <> ""
+          
+          If LCase(Left(Parameter, Len("list"))) = "list" Or 
+             LCase(Left(Parameter, Len("map"))) = "map" Or
+             Left(Parameter, 1) = "*"
+            
+            ProcedureReturn "CompilerError:\n" + ProcName + "\nLists, Maps And Pointers are not allowed (yet)"
+            
+          EndIf
+          
+          RequestSelect + "Request.Form(" + Str(ParamCounter + 2) + "), "
+          
+        EndIf
+        
+      Next
+      
+      If EndsWith(Trim(RequestSelect), ",")
+        RequestSelect = Left(Trim(RequestSelect), Len(Trim(RequestSelect)) - 1)
+      EndIf
+      
+      RequestSelect + ")" + #CRLF$
+      
+    Wend
+    
+    FreeRegularExpression(regex_Procedure)
+    
+  EndIf
+  
+  If RequestSelect <> ""
+    
+    RequestSelect = "If Request.ServerVariables(" + Chr(34) + "REQUEST_METHOD" + Chr(34) + ")= " + Chr(34) + "POST" + Chr(34) + " Then" + #CRLF$ + 
+		                "" + #CRLF$ +
+                    #TAB$ + "Dim myRequest" + #CRLF$ + 
+	                  #TAB$ + "myRequest = LCase(Request.Form(1))" + #CRLF$ +
+		                "" + #CRLF$ +
+		                #TAB$ + "Select Case myRequest" + #CRLF$ +
+                    RequestSelect + 
+                    #TAB$ + #TAB$ + "Case Else" + #CRLF$ +
+                    #TAB$ + #TAB$ + #TAB$ + "Response.Write " + Chr(34) + "unknown request: '" + Chr(34) + " & myRequest & " + Chr(34) + "'" + Chr(34) + #CRLF$ +
+                    #TAB$ + "End Select" + #CRLF$ +
+		                "" + #CRLF$ +
+                    "End If"
+    
+  EndIf
+  
+	Debug RequestSelect
+	
+	ProcedureReturn RequestSelect
+	
+EndProcedure
+Procedure.s GetRequestSelect4PHP(ServerCode.s)
+  
+  Protected regex_Procedure
+  
+  Protected CurrentProcedure.s
+  Protected ProcedureLine.s
+  
+  Protected ProcName.s
+  Protected RequestSelect.s
+  Protected ParamCounter
+  
+  regex_Procedure = CreateRegularExpression(#PB_Any, "^[\t]*[\ ]*ProcedureDLL([\s\S]*?)\(([\s\S]*?)^[\s]*EndProcedure", #PB_RegularExpression_MultiLine | #PB_RegularExpression_NoCase)	
+  
+  If ExamineRegularExpression(regex_Procedure, ServerCode)
+    
+    While NextRegularExpressionMatch(regex_Procedure)
+      
+      CurrentProcedure = RegularExpressionMatchString(regex_Procedure)
+      
+      ProcName = Trim(RemoveString(CurrentProcedure, "ProcedureDLL", #PB_String_NoCase))
+      
+      If Left(ProcName, 2) = ".s"
+        ProcName = Trim(Mid(ProcName, 3))
+      EndIf
+      
+      ProcName = Trim(StringField(ProcName, 1, "("))
+      
+      RequestSelect + #TAB$ + "case " + Chr(34) + LCase(ProcName) + Chr(34) + ":" + #CRLF$
+      
+      RequestSelect + #TAB$ + #TAB$ + "$ReturnValue = " + ProcName + "("
+      
+      ProcedureLine = StringField(CurrentProcedure, 1, #LF$)
+      
+      Protected Parameters.s = ParseParameter(ProcedureLine)
+      
+      Protected Parameter.s
+      
+      For ParamCounter = 0 To CountString(Parameters, Chr(1))
+        
+        Parameter = Trim(StringField(Parameters, ParamCounter + 1, Chr(1)))
+        
+        If Parameter <> ""
+          
+          If LCase(Left(Parameter, Len("list"))) = "list" Or 
+             LCase(Left(Parameter, Len("map"))) = "map" Or
+             Left(Parameter, 1) = "*"
+            
+            ProcedureReturn "CompilerError:\n" + ProcName + "\nLists, Maps And Pointers are not allowed (yet)"
+            
+          EndIf
+          
+          RequestSelect + " $_POST(" + Str(ParamCounter + 1) + "), "
+          
+        EndIf
+        
+      Next
+      
+      If EndsWith(Trim(RequestSelect), ",")
+        RequestSelect = Left(Trim(RequestSelect), Len(Trim(RequestSelect)) - 1)
+      EndIf
+      
+      RequestSelect + ");" + #CRLF$
+      RequestSelect + #TAB$ + #TAB$ + "break;" + #CRLF$
+      
+    Wend
+    
+    FreeRegularExpression(regex_Procedure)
+    
+  EndIf
+  
+  If RequestSelect <> ""
+    
+    RequestSelect = "switch ($request) {" + #CRLF$ +
+                    RequestSelect + 
+                    #TAB$ + "default:" + #CRLF$ +
+                    #TAB$ + #TAB$ + "$ReturnValue = " + Chr(34) + "unknown request: '" + Chr(34) + " . $request . " + Chr(34) + "'" + Chr(34) + ";" + #CRLF$ +
+                    #TAB$ + #TAB$ + "break;" + #CRLF$ +
+                    "}"
     
   EndIf
   
@@ -265,114 +427,97 @@ Procedure.s GetRequestSelect4PbCgi(ServerCode.s)
   ProcedureReturn RequestSelect
   
 EndProcedure
-Procedure.s GetRequestSelect4Asp(ServerCode.s)
+Procedure.s GetRequestSelect4Aspx(ServerCode.s)
   
-	Protected Lexer.iPBSC = New_PBSC() 	
-	
-	Protected RequestSelect.s
-	
-	ServerCode = ReplaceString(ServerCode, #CRLF$, #LF$)
-	
-	Lexer\SetFileString(ServerCode)
-	
-	ClearList(Token())
-	
-	; Token einlesen
-	While Lexer\IsNextToken() 
-		AddElement(Token())
-		Token()\Token = Lexer\GetNextToken() 
-		Token()\Type  = Lexer\GetCurrentType() 
-		Token()\Line = Lexer\GetCurrentLineNb()
-	Wend
-	
-	PBSC_CloseFile(Lexer)
-	
-	Protected *Old_Element
-	Protected isExport
-	
-	Protected ProcName.s
-	
-	Protected ParamCounter
-	
-	ForEach Token()
-		Select Token()\Type
-			Case #PBSC_Identifier
-			  Select LCase(Token()\Token)
-			      
-					Case "procedure"
-					  
-					  ParamCounter = 2 ; paramcounter start at 2!!!
-					  
-						NextElement(Token())
-						
-						If Token()\Token = "."
-							
-							NextElement(Token())
-							NextElement(Token())
-							
-						EndIf
-						
-						ProcName = Token()\Token
-						
-						RequestSelect + #TAB$ + "Case " + Chr(34) + LCase(ProcName) + Chr(34) + #CRLF$
-						
-						RequestSelect + #TAB$ + #TAB$ + "Response.Write " + ProcName + " ( "
-						
-						NextElement(Token()) ; Klammer auf
-						NextElement(Token()) ; Klammer zu?
-						
-						While Token()\Token <> ")"
-							
-							RequestSelect + " Request.Form(" + ParamCounter + "), "
-							
-							ParamCounter + 1
-							
-							If CheckNextToken(Token(), ".")
-								NextElement(Token())
-								NextElement(Token())
-							EndIf
-							
-							If CheckNextToken(Token(), ",")
-								NextElement(Token())
-							EndIf
-							
-							NextElement(Token())
-							
-						Wend
-						
-						If EndsWith(Trim(RequestSelect), ",")
-							RequestSelect = Left(Trim(RequestSelect), Len(Trim(RequestSelect)) - 1)
-						EndIf
-						
-						RequestSelect + " ) " + #CRLF$
-						
-				EndSelect
-		EndSelect
-	Next
-	
-	If RequestSelect <> ""
-		
-	  RequestSelect = "Dim myRequest" + #CRLF$ + 
-	                  "myRequest = LCase(Request.Form(1))" + #CRLF$ +
-		                "" + #CRLF$ +
-		                "Select Case myRequest" + #CRLF$ +
-		                RequestSelect + #CRLF$ +
-		                "Case Else" + #CRLF$ +
-		                " Response.Write " + Chr(34) + "unknown request: '" + Chr(34) + " & myRequest & " + Chr(34) + "'" + Chr(34) + #CRLF$ +
-		                "End Select"  
-		
-	EndIf
-	
-	;Debug RequestSelect
-	
-	ProcedureReturn RequestSelect
+  Protected regex_Procedure
+  
+  Protected CurrentProcedure.s
+  Protected ProcedureLine.s
+  
+  Protected ProcName.s
+  Protected RequestSelect.s
+  Protected ParamCounter
+  
+  regex_Procedure = CreateRegularExpression(#PB_Any, "^[\t]*[\ ]*ProcedureDLL([\s\S]*?)\(([\s\S]*?)^[\s]*EndProcedure", #PB_RegularExpression_MultiLine | #PB_RegularExpression_NoCase)	
+  
+  If ExamineRegularExpression(regex_Procedure, ServerCode)
+    
+    While NextRegularExpressionMatch(regex_Procedure)
+      
+      CurrentProcedure = RegularExpressionMatchString(regex_Procedure)
+      
+      ProcName = Trim(RemoveString(CurrentProcedure, "ProcedureDLL", #PB_String_NoCase))
+      
+      If Left(ProcName, 2) = ".s"
+        ProcName = Trim(Mid(ProcName, 3))
+      EndIf
+      
+      ProcName = Trim(StringField(ProcName, 1, "("))
+      
+      RequestSelect + #TAB$ + "Case " + Chr(34) + LCase(ProcName) + Chr(34) + #CRLF$
+      
+      RequestSelect + #TAB$ + #TAB$ + "ReturnValue = " + ProcName + "("
+      
+      ProcedureLine = StringField(CurrentProcedure, 1, #LF$)
+      
+      Protected Parameters.s = ParseParameter(ProcedureLine)
+      
+      Protected Parameter.s
+      
+      For ParamCounter = 0 To CountString(Parameters, Chr(1))
+        
+        Parameter = Trim(StringField(Parameters, ParamCounter + 1, Chr(1)))
+        
+        If Parameter <> ""
+          
+          If LCase(Left(Parameter, Len("list"))) = "list" Or 
+             LCase(Left(Parameter, Len("map"))) = "map" Or
+             Left(Parameter, 1) = "*"
+            
+            ProcedureReturn "CompilerError:\n" + ProcName + "\nLists, Maps And Pointers are not allowed (yet)"
+            
+          EndIf
+          
+          RequestSelect + "Request.Form(" + Str(ParamCounter + 1) + "), "
+          
+        EndIf
+        
+      Next
+      
+      If EndsWith(Trim(RequestSelect), ",")
+        RequestSelect = Left(Trim(RequestSelect), Len(Trim(RequestSelect)) - 1)
+      EndIf
+      
+      RequestSelect + ")" + #CRLF$
+      
+    Wend
+    
+    FreeRegularExpression(regex_Procedure)
+    
+  EndIf
+  
+  If RequestSelect <> ""
+    
+	  RequestSelect = "Dim myRequest = LCase(Request.Form(0))" + #CRLF$ +
+                    "Select Case myRequest" + #CRLF$ +
+                    RequestSelect + 
+                    #TAB$ + "Case Else" + #CRLF$ +
+                    #TAB$ + #TAB$ + "ReturnValue = " + Chr(34) + "unknown request: '" + Chr(34) + " & myRequest & " + Chr(34) + "'" + Chr(34) + #CRLF$ +
+                    "End Select"
+    
+  EndIf
+  
+  ; Debug RequestSelect
+  
+  ProcedureReturn RequestSelect
 	
 EndProcedure
+
 
 Procedure.s ConvertToPbCgi(Code.s)
   ProcedureReturn Code
 EndProcedure
-Procedure.s ConvertToASPX(Code.s)
+Procedure.s ConvertToAspx(Code.s)
 		
 	Code = #LF$ + Code
 	
@@ -402,7 +547,7 @@ Procedure.s ConvertToASPX(Code.s)
 		Select TT()\Type
 			Case #PBSC_Identifier
 				Select LCase(TT()\Token)
-				  Case "procedure"
+				  Case "proceduredll"
 				    
 						TT()\Token = "Public Shared Function"
 						
@@ -483,7 +628,7 @@ Procedure.s ConvertToPHP(Code.s)
 			Case #PBSC_Identifier
 				
 				Select LCase(TT()\Token)
-					Case "procedure"
+					Case "proceduredll"
 						TT()\Token = "function"
 						inProcedure = #True
 					Case "endprocedure"
@@ -602,7 +747,7 @@ Procedure.s ConvertToASP(Code.s)
 		Select TT()\Type
 			Case #PBSC_Identifier
 				Select LCase(TT()\Token)
-					Case "procedure"
+					Case "proceduredll"
 						TT()\Token = "Function"
 						inProcedure = #True
 					Case "endprocedure"
@@ -973,7 +1118,7 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   	
   	CodeBlock = RegularExpressionMatchString(regex_SC)
   	
-  	regex_P = CreateRegularExpression(#PB_Any, "^[\t]*[\ ]*Procedure([\s\S]*?)\(([\s\S]*?)^[\s]*EndProcedure", #PB_RegularExpression_MultiLine | #PB_RegularExpression_NoCase)	
+  	regex_P = CreateRegularExpression(#PB_Any, "^[\t]*[\ ]*ProcedureDLL([\s\S]*?)\(([\s\S]*?)^[\s]*EndProcedure", #PB_RegularExpression_MultiLine | #PB_RegularExpression_NoCase)	
   	
   	ExamineRegularExpression(regex_P, CodeBlock)
   	
@@ -981,9 +1126,13 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   	  
   	  CurrentProcedure = RegularExpressionMatchString(regex_P)
   	  
-  		ClientProcedures + StringField(CurrentProcedure, 1, #LF$) + #LF$
+  		If LCase(Left(Trim(CurrentProcedure), Len("ProcedureDLL"))) = "proceduredll"
+  		  CurrentProcedure = ReplaceString(CurrentProcedure, "ProcedureDLL", "Procedure", #PB_String_NoCase)
+  		EndIf
   		
-  		Protected dataType.s
+  		ClientProcedures + StringField(CurrentProcedure, 1, #LF$) + #LF$
+  	  
+  	  Protected dataType.s
   		Protected processData.s
   		
   		dataType = "text"
@@ -992,6 +1141,7 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   		Protected CallbackProcedure.s
   		
   		CurrentProcedure  = StringField(CurrentProcedure, 1, "(")
+  		
   		CurrentProcedure  = Trim(StringField(CurrentProcedure, CountString(CurrentProcedure, " ") + 1, " "))
   		
   		CallbackProcedure = "f_" + LCase(CurrentProcedure) + "callback"
@@ -1056,19 +1206,33 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
             FileContent = AddCompilerError(FileContent, Mid(RequestSelect, Len("CompilerError") + 3))
             
           Else
+            
             ServerCode    = ConvertToASP(ServerCode)
             TemplateCode  = LoadTextFile(TemplateFilename)
             TemplateCode  = ReplaceString(TemplateCode, "' ### ServerCode ###", ServerCode)
             TemplateCode  = ReplaceString(TemplateCode, "' ### RequestSelect ###", RequestSelect)
             SaveTextFile(TemplateCode, ServerFilename)
+            
           EndIf
           
         Case #ServerCodeType_Aspx
-          ServerCode    = ConvertToASPX(ServerCode)
-          TemplateCode  = LoadTextFile(TemplateFilename)
-          TemplateCode  = ReplaceString(TemplateCode, "' ### ServerCode ###", ServerCode)
-          SaveTextFile(TemplateCode, ServerFilename)
           
+          RequestSelect = GetRequestSelect4Aspx(ServerCode)
+          
+          If Left(RequestSelect, Len("CompilerError")) = "CompilerError"
+            
+            FileContent = AddCompilerError(FileContent, Mid(RequestSelect, Len("CompilerError") + 3))
+            
+          Else
+          
+            ServerCode    = ConvertToAspx(ServerCode)
+            TemplateCode  = LoadTextFile(TemplateFilename)
+            TemplateCode  = ReplaceString(TemplateCode, "' ### ServerCode ###", ServerCode)
+            TemplateCode  = ReplaceString(TemplateCode, "' ### RequestSelect ###", RequestSelect)
+            SaveTextFile(TemplateCode, ServerFilename)
+            
+          EndIf
+            
         Case #ServerCodeType_PbCgi
           
           RequestSelect = GetRequestSelect4PbCgi(ServerCode)
@@ -1162,11 +1326,22 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
           
         Case #ServerCodeType_Php
           
-          ServerCode = ConvertToPHP(ServerCode)
-          TemplateCode = LoadTextFile(TemplateFilename)
-          TemplateCode = ReplaceString(TemplateCode, "// ### ServerCode ###", ServerCode)
-          SaveTextFile(TemplateCode, ServerFilename)
+          RequestSelect = GetRequestSelect4PHP(ServerCode)
           
+          If Left(RequestSelect, Len("CompilerError")) = "CompilerError"
+            
+            FileContent = AddCompilerError(FileContent, Mid(RequestSelect, Len("CompilerError") + 3))
+            
+          Else
+          
+            ServerCode   = ConvertToPHP(ServerCode)
+            TemplateCode = LoadTextFile(TemplateFilename)
+            TemplateCode = ReplaceString(TemplateCode, "// ### ServerCode ###",    ServerCode)
+            TemplateCode = ReplaceString(TemplateCode, "// ### RequestSelect ###", RequestSelect)
+            SaveTextFile(TemplateCode, ServerFilename)
+            
+          EndIf
+            
         Case #ServerCodeType_Python
           
           ServerCode = ConvertToPython(ServerCode)
@@ -1267,7 +1442,8 @@ Procedure Main()
   
   SourceFile.s = ProgramParameter() ; %COMPILEFILE!
   
-  ; SourceFile = "C:\Users\Administrator\AppData\Local\Temp\14\PB_EditorOutput2.pb"
+  ; SourceFile = "C:\Users\Administrator\AppData\Local\Temp\8\PB_EditorOutput.pb.original"
+  
   ; SourceFile = "/tmp/PB_EditorOutput2.pb"
   
   If SourceFile = "" ; no commandline-parameter
@@ -1316,6 +1492,7 @@ Procedure Main()
     EndIf
     
     ; Debug FileContent
+    
     SaveTextFile(FileContent, SourceFile)
     
   EndIf
