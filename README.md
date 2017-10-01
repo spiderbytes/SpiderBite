@@ -194,6 +194,10 @@ EndIf
 
 {ToDo}
 
+## Öffentliche und private Prozeduren
+
+{ToDo}
+
 ## ToDo
 
 * Momentan sind nur einfache Übergabeparameter (Zeichenketten und Zahlen) erlaubt.
