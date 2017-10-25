@@ -1,0 +1,60 @@
+﻿; either include "SpiderBite.sbi":
+; XIncludeFile "[YourPathTo]/SpiderBite.sbi"
+;
+; ... or copy "SpiderBite.res" to SpiderBasics Residents-Folder
+
+#SpiderBite_Profile = "default"
+
+Procedure GetDataCallback(Success, Result.s)
+  
+  Debug "Success: " + Success
+  Debug "Result: " + Result
+  
+EndProcedure
+
+EnablePbCgi
+  
+  UseSQLiteDatabase()
+  
+  ProcedureDLL.s GetData()
+    
+    Protected ReturnValue.s
+    Protected DB
+    
+    DB = OpenDatabase(#PB_Any, ":memory:", "", "", #PB_Database_SQLite)
+    
+    If DB
+      
+      DatabaseUpdate(DB, "Create Table SuperHeroes (Prename TEXT, Surname TEXT)")
+      
+      DatabaseUpdate(DB, "Insert Into SuperHeroes (Prename, Surname) Values ('Peter', 'Parker')")
+      DatabaseUpdate(DB, "Insert Into SuperHeroes (Prename, Surname) Values ('Bruce', 'Wayne')")
+      DatabaseUpdate(DB, "Insert Into SuperHeroes (Prename, Surname) Values ('Clark', 'Kent')")
+      
+      If DatabaseQuery(DB, "Select * From SuperHeroes Where Prename = 'Peter'")
+        
+        While NextDatabaseRow(DB)
+        
+          ReturnValue + GetDatabaseString(DB, 1) + "," + GetDatabaseString(DB, 0) + #CRLF$
+        
+        Wend
+        
+        FinishDatabaseQuery(DB)
+        
+      EndIf
+      
+      CloseDatabase(DB)
+      
+    EndIf
+    
+    ProcedureReturn ReturnValue
+    
+  EndProcedure
+  
+DisablePbCgi
+
+GetData()
+
+If 1=2 ; prevent removing the 'unneeded' callback
+  GetDataCallback(0, "")
+EndIf
