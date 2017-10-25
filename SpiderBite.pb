@@ -3,7 +3,7 @@
 Global SourceFile.s
 
 #AppName = "SpiderBite"
-#AppVersion = "2017-10-01"
+#AppVersion = "2017-10-25"
 
 #ServerCodeType_NodeJs = "NodeJs"
 #ServerCodeType_Php    = "Php"
@@ -1140,7 +1140,7 @@ Procedure.s ProcessServerCode(FileContent.s, ServerCodeType.s)
   		
   		Protected CallbackProcedure.s
   		
-  		CurrentProcedure  = StringField(CurrentProcedure, 1, "(")
+  		CurrentProcedure  = Trim(StringField(CurrentProcedure, 1, "("))
   		
   		CurrentProcedure  = Trim(StringField(CurrentProcedure, CountString(CurrentProcedure, " ") + 1, " "))
   		
@@ -1442,7 +1442,7 @@ Procedure Main()
   
   SourceFile.s = ProgramParameter() ; %COMPILEFILE!
   
-  ; SourceFile = "C:\Users\Administrator\AppData\Local\Temp\8\PB_EditorOutput.pb.original"
+  ; SourceFile = "C:\Users\Administrator\AppData\Local\Temp\7\PB_EditorOutput.pb.original"
   
   ; SourceFile = "/tmp/PB_EditorOutput2.pb"
   
