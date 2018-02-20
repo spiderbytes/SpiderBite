@@ -11,8 +11,6 @@ SpiderBite ist ein Präprozessor für SpiderBasic, der es ermöglicht, in einem 
 
 Wie bekannt ist, kann und darf der von SpiderBasic generierte Code nicht direkt auf die Hardware des WebServers zugreifen. Somit ist es nicht möglich, direkte Datenbankabfragen, Filesystemzugriffe oder sonstiges aus SpiderBasic auszuführen. Die bisherige Vorgehensweise ist es, eine serverseitige Komponente zu programmieren (sei es als CGI oder PHP- (ASP-, Python-, ...) Script) und diese Komponente dann in SpiderBasic mittels HttpRequest() aufzurufen. Das funktioniert eigentlich ganz gut, ist aber meines Erachtens nicht besonders komfortabel. Aus diesem Grund habe ich mich entschlossen, SpiderBite zu entwickeln.
 
-![](https://i.imgur.com/20HJMrK.png)
-
 ### Ein simples Beispiel
 
 ```
@@ -30,6 +28,8 @@ Debug myPbCgiProcedure()
 ```
 
 Der Code, der oben in dem `EnablePbCgi/DisablePbCgi` - Block notiert ist, wird vor dem eigentlichen Konvertierungsvorgang durch SpiderBite extrahiert und in eine eigene PureBasic-Executable kompiliert (eine sogenannte CGI-EXE), die dann auf dem Server ausgeführt wird. Hierbei steht im ServerCode-Block der gesamte PureBasic-Befehlsvorrat zur Verfügung.
+
+![](https://i.imgur.com/20HJMrK.png)
 
 Neben der Möglichkeit, PureBasic-CGI zu erstellen stehen auch Blockbereiche für PHP, ASP und ASPX zur Verfügung. Ein Beispiel für PHP:
 
