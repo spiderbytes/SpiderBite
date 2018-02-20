@@ -1,5 +1,6 @@
 # SpiderBite
 
+
 ## Breaking Change
 
 Ab der Version vom 01.10.2017 wird zwischen öffentlichen und privaten Prozeduren unterschieden. Mehr dazu [hier](#Öffentliche-und-private-prozeduren).
@@ -9,6 +10,8 @@ Ab der Version vom 01.10.2017 wird zwischen öffentlichen und privaten Prozedure
 SpiderBite ist ein Präprozessor für SpiderBasic, der es ermöglicht, in einem Code Bereiche zu markieren, die auf dem WebServer ausgeführt werden (der sogenannte ServerCode (PB2Web-User werden es kennen :wink:)). 
 
 Wie bekannt ist, kann und darf der von SpiderBasic generierte Code nicht direkt auf die Hardware des WebServers zugreifen. Somit ist es nicht möglich, direkte Datenbankabfragen, Filesystemzugriffe oder sonstiges aus SpiderBasic auszuführen. Die bisherige Vorgehensweise ist es, eine serverseitige Komponente zu programmieren (sei es als CGI oder PHP- (ASP-, Python-, ...) Script) und diese Komponente dann in SpiderBasic mittels HttpRequest() aufzurufen. Das funktioniert eigentlich ganz gut, ist aber meines Erachtens nicht besonders komfortabel. Aus diesem Grund habe ich mich entschlossen, SpiderBite zu entwickeln.
+
+![](https://i.imgur.com/20HJMrK.png)
 
 ### Ein simples Beispiel
 
