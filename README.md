@@ -1,5 +1,8 @@
 # SpiderBite
 
+## Etwas in eigener Sache
+
+Wenn Dir meine Arbeit gefällt, würde ich mich freuen, [wenn Du mich mit einer kleinen Spende unterstützen würdest](https://www.paypal.me/ptsw).
 
 ## Breaking Change
 
@@ -247,3 +250,7 @@ Debug myPrivateProcedure() ; this will generate the error 'myPrivateProcedure() 
 ## Lizenz
 
 [MIT](https://github.com/spiderbytes/SpiderBite/blob/master/LICENSE)
+
+## Etwas in eigener Sache
+
+Wenn Dir meine Arbeit gefällt, würde ich mich freuen, [wenn Du mich mit einer kleinen Spende unterstützen würdest](https://www.paypal.me/ptsw).
